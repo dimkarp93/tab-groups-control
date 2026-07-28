@@ -1,0 +1,152 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Groups Control",
+  "version": "1.2.1",
+  "description": "Управление нативными группами вкладок Firefox с клавиатуры: сворачивание, сохранение и восстановление состояния, создание и пересортировка групп.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tab-groups-control@local",
+      "strict_min_version": "139.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "storage",
+    "notifications",
+    "browserSettings",
+    "downloads"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "action": {
+    "default_title": "Группы вкладок",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon.svg",
+      "96": "icon.svg"
+    }
+  },
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Ctrl+Alt+T" },
+      "description": "Открыть список групп (затем цифра 0-9)"
+    },
+    "toggle-all": {
+      "suggested_key": { "default": "Ctrl+Alt+0" },
+      "description": "Свернуть/развернуть все группы"
+    },
+    "toggle-group-1": {
+      "suggested_key": { "default": "Ctrl+Alt+1" },
+      "description": "Свернуть/развернуть группу 1"
+    },
+    "toggle-group-2": {
+      "suggested_key": { "default": "Ctrl+Alt+2" },
+      "description": "Свернуть/развернуть группу 2"
+    },
+    "toggle-group-3": {
+      "suggested_key": { "default": "Ctrl+Alt+3" },
+      "description": "Свернуть/развернуть группу 3"
+    },
+    "toggle-group-4": {
+      "suggested_key": { "default": "Ctrl+Alt+4" },
+      "description": "Свернуть/развернуть группу 4"
+    },
+    "toggle-group-5": {
+      "suggested_key": { "default": "Ctrl+Alt+5" },
+      "description": "Свернуть/развернуть группу 5"
+    },
+    "toggle-group-6": {
+      "suggested_key": { "default": "Ctrl+Alt+6" },
+      "description": "Свернуть/развернуть группу 6"
+    },
+    "toggle-group-7": {
+      "suggested_key": { "default": "Ctrl+Alt+7" },
+      "description": "Свернуть/развернуть группу 7"
+    },
+    "toggle-group-8": {
+      "suggested_key": { "default": "Ctrl+Alt+8" },
+      "description": "Свернуть/развернуть группу 8"
+    },
+    "toggle-group-9": {
+      "suggested_key": { "default": "Ctrl+Alt+9" },
+      "description": "Свернуть/развернуть группу 9"
+    },
+    "focus-group-1": {
+      "suggested_key": { "default": "Alt+Shift+1" },
+      "description": "Перейти на первую вкладку группы 1"
+    },
+    "focus-group-2": {
+      "suggested_key": { "default": "Alt+Shift+2" },
+      "description": "Перейти на первую вкладку группы 2"
+    },
+    "focus-group-3": {
+      "suggested_key": { "default": "Alt+Shift+3" },
+      "description": "Перейти на первую вкладку группы 3"
+    },
+    "focus-group-4": {
+      "suggested_key": { "default": "Alt+Shift+4" },
+      "description": "Перейти на первую вкладку группы 4"
+    },
+    "focus-group-5": {
+      "suggested_key": { "default": "Alt+Shift+5" },
+      "description": "Перейти на первую вкладку группы 5"
+    },
+    "focus-group-6": {
+      "suggested_key": { "default": "Alt+Shift+6" },
+      "description": "Перейти на первую вкладку группы 6"
+    },
+    "focus-group-7": {
+      "suggested_key": { "default": "Alt+Shift+7" },
+      "description": "Перейти на первую вкладку группы 7"
+    },
+    "focus-group-8": {
+      "suggested_key": { "default": "Alt+Shift+8" },
+      "description": "Перейти на первую вкладку группы 8"
+    },
+    "focus-group-9": {
+      "suggested_key": { "default": "Alt+Shift+9" },
+      "description": "Перейти на первую вкладку группы 9"
+    },
+    "save-state": {
+      "suggested_key": { "default": "Ctrl+Alt+S" },
+      "description": "Сохранить состояние окна"
+    },
+    "restore-state": {
+      "suggested_key": { "default": "Ctrl+Alt+R" },
+      "description": "Восстановить состояние окна"
+    },
+    "close-ungrouped": {
+      "suggested_key": { "default": "Ctrl+Alt+W" },
+      "description": "Закрыть все вкладки вне групп"
+    },
+    "clear-profile": {
+      "suggested_key": { "default": "Ctrl+Alt+C" },
+      "description": "Очистить активный профиль"
+    },
+    "delete-profile": {
+      "suggested_key": { "default": "Ctrl+Alt+D" },
+      "description": "Удалить профиль"
+    },
+    "new-group": {
+      "suggested_key": { "default": "Ctrl+Alt+N" },
+      "description": "Новая группа для текущей вкладки"
+    },
+    "add-to-group": {
+      "suggested_key": { "default": "Ctrl+Alt+A" },
+      "description": "Добавить текущую вкладку в существующую группу"
+    },
+    "reorder-groups": {
+      "suggested_key": { "default": "Ctrl+Alt+O" },
+      "description": "Пересортировать группы"
+    }
+  }
+}
