@@ -1,81 +1,86 @@
 # Tab Groups Control
 
-Небольшое расширение для Firefox, управляющее **нативными группами вкладок** (API `tabGroups`) с клавиатуры: сворачивание и разворачивание групп, сохранение и восстановление состояния окна, создание групп, добавление вкладок и интерактивная пересортировка.
+*[Русская версия](README.ru.md)*
 
-Требуется **Firefox 139+** (нативные группы вкладок и `tabGroups` API). Проверено на Firefox 140 ESR.
+A small Firefox extension that drives **native tab groups** (the `tabGroups` API) from the keyboard: collapsing and expanding groups, saving and restoring the window state, creating groups, adding tabs and reordering groups interactively.
 
-## Как проверить локально
+Requires **Firefox 139+** (native tab groups and the `tabGroups` API). Tested on Firefox 140 ESR.
 
-Расширение не упаковано и не подписано — его загружают как временное дополнение, никаких сборок и зависимостей не нужно.
+The interface speaks English by default and switches to Russian when the browser UI language is Russian — see [Interface language](#how-it-works).
 
-1. Откройте `about:debugging#/runtime/this-firefox`.
-2. Нажмите **Load Temporary Add-on…** («Загрузить временное дополнение…»).
-3. Выберите файл `manifest.json` из этого каталога.
-4. Расширение появится в списке и сразу заработает; кнопка **Inspect** рядом с ним открывает консоль фонового скрипта — там видно ошибки.
+## Trying it locally
 
-Временное дополнение исчезает при перезапуске Firefox — просто повторите шаги 1–3.
+The extension is neither packaged nor signed — load it as a temporary add-on, no build step and no dependencies required.
 
-### Быстрый чек-лист
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on…**.
+3. Pick the `manifest.json` file from this directory.
+4. The extension shows up in the list and works right away; the **Inspect** button next to it opens the background script console where errors appear.
 
-1. Создайте вручную 2–3 группы: ПКМ по вкладке → *Добавить вкладку в новую группу*.
-2. `Ctrl+Alt+1`, `Ctrl+Alt+2` — соответствующие группы сворачиваются и разворачиваются; при разворачивании активной становится первая вкладка группы, при сворачивании — первая вкладка ближайшей оставшейся развёрнутой группы.
-3. `Ctrl+Alt+0` — сворачиваются все, повторное нажатие разворачивает и переводит фокус на первую вкладку первой группы, если активной была пустая вкладка вне групп (она при этом закрывается).
-4. `Alt+Shift+1`, `Alt+Shift+2` — фокус переходит на первую вкладку соответствующей группы; свёрнутая группа при этом разворачивается.
-5. `Ctrl+Alt+T` — открывается список групп, нажатие цифры делает то же самое.
-6. `Ctrl+Alt+N` — окно ввода имени и палитра цветов квадратиками; предвыбран первый цвет, ещё не занятый группами этого окна. Текущая вкладка попадает в новую группу.
-7. `Ctrl+Alt+A` — выбор существующей группы, вкладка переезжает в неё.
-8. `Ctrl+Alt+O` — перетащите строки, «Применить» — порядок групп в панели вкладок меняется.
-9. `Ctrl+Alt+S`, затем измените окно (закройте или откройте вкладки, закрепите одну), затем `Ctrl+Alt+R` — диалог с диффом, после подтверждения в окне остаётся ровно содержимое снимка: вкладок вне групп и закреплённых не остаётся. И сохранение, и восстановление показывают системную нотификацию с итогом.
-10. `Ctrl+Alt+W` — все вкладки вне групп закрываются, остаются только группы и закреплённые вкладки.
-11. `Ctrl+Alt+0` при развёрнутых группах — в конце панели появляется вкладка с домашней страницей вне групп, она становится активной, и сворачиваются все группы без исключения.
-12. `Ctrl+Alt+C` — нотификация о том, сколько групп и вкладок стёрто; попап показывает «снимок ещё не сохранён», а `Ctrl+Alt+R` для этого профиля сообщает, что восстанавливать нечего.
-13. `Ctrl+Alt+D` — диалог с выбором профиля: Esc отменяет, Enter удаляет выбранный профиль.
+A temporary add-on disappears when Firefox restarts — just repeat steps 1–3.
 
-Результат каждой команды показывается значком на иконке расширения (`✓` или `!`); подробное сообщение — во всплывающей подсказке иконки, а для снимков и `Ctrl+Alt+W` — ещё и в системной нотификации.
+### Quick checklist
 
-### Если хоткей не срабатывает
+1. Create 2–3 groups by hand: right-click a tab → *Add Tab to New Group*.
+2. `Ctrl+Alt+1`, `Ctrl+Alt+2` — the matching groups collapse and expand; expanding activates the first tab of the group, collapsing moves focus to the first tab of the nearest group that is still expanded.
+3. `Ctrl+Alt+0` — everything collapses; pressing it again expands everything and moves focus to the first tab of the first group if the active tab was an empty tab outside groups (that tab is closed).
+4. `Alt+Shift+1`, `Alt+Shift+2` — focus jumps to the first tab of the matching group; a collapsed group is expanded first.
+5. `Ctrl+Alt+T` — the group list opens, pressing a digit does the same thing.
+6. `Ctrl+Alt+N` — a name field and a palette of color swatches; the first color not yet used by the groups of this window is preselected. The current tab lands in the new group.
+7. `Ctrl+Alt+A` — pick an existing group, the tab moves into it.
+8. `Ctrl+Alt+O` — drag the rows, press “Apply”, and the group order in the tab strip changes.
+9. `Ctrl+Alt+S`, then change the window (close or open tabs, pin one), then `Ctrl+Alt+R` — a dialog with the diff; after confirming, the window holds exactly the snapshot contents: no tabs outside groups and no pinned tabs are left. Both saving and restoring show a system notification with the result.
+10. `Ctrl+Alt+W` — every tab outside groups is closed, only groups and pinned tabs remain.
+11. `Ctrl+Alt+0` with expanded groups — a tab with the home page appears at the end of the strip outside groups, becomes active, and every group collapses without exception.
+12. `Ctrl+Alt+C` — a notification about how many groups and tabs were wiped; the popup says “no snapshot yet”, and `Ctrl+Alt+R` for that profile reports there is nothing to restore.
+13. `Ctrl+Alt+D` — a dialog with a profile picker: Esc cancels, Enter deletes the selected profile.
 
-`Ctrl+Alt+T` во многих окружениях Linux (GNOME, Ubuntu) перехватывается системой и открывает терминал. Системные сочетания имеют приоритет над браузерными. Переназначить можно в `about:addons` → шестерёнка → **Управление горячими клавишами расширений** (Manage Extension Shortcuts). Прямые `Ctrl+Alt+0…9` работают независимо от `Ctrl+Alt+T`.
+The result of every command is shown as a badge on the extension icon (`✓` or `!`); the detailed message lives in the icon tooltip, and for snapshots and `Ctrl+Alt+W` also in a system notification.
 
-`Alt+Shift+<цифра>` тоже стоит проверить отдельно: в Linux сочетания с `Alt+Shift` часто заняты системным переключением раскладки клавиатуры, и тогда до браузера они не доходят. Лечится там же — переназначением в **Управление горячими клавишами расширений** либо в настройках раскладки самой системы.
+### When a shortcut does not fire
 
-## Горячие клавиши
+In many Linux environments (GNOME, Ubuntu) `Ctrl+Alt+T` is grabbed by the system and opens a terminal. System shortcuts take precedence over browser ones. Rebind it in `about:addons` → gear icon → **Manage Extension Shortcuts**. The direct `Ctrl+Alt+0…9` shortcuts work regardless of `Ctrl+Alt+T`.
 
-| Сочетание | Действие |
+`Alt+Shift+<digit>` is worth checking separately: on Linux, `Alt+Shift` combinations are often taken by the system keyboard layout switcher, and then they never reach the browser. The cure is the same — rebind in **Manage Extension Shortcuts** or change the layout settings of the system itself.
+
+## Shortcuts
+
+| Shortcut | Action |
 |---|---|
-| `Ctrl+Alt+T` | Открыть список групп; далее цифра `0`–`9` |
-| `Ctrl+Alt+0` | Свернуть/развернуть **все** группы |
-| `Ctrl+Alt+1` … `Ctrl+Alt+9` | Свернуть/развернуть `i`-ю группу (при разворачивании — переход на её первую вкладку) |
-| `Alt+Shift+1` … `Alt+Shift+9` | Перейти на **первую вкладку** `i`-й группы |
-| `Ctrl+Alt+S` | Сохранить состояние окна в хранилище расширения |
-| `Ctrl+Alt+R` | Восстановить состояние окна из хранилища |
-| `Ctrl+Alt+W` | Закрыть все вкладки вне групп (кроме закреплённых) |
-| `Ctrl+Alt+C` | Очистить активный профиль (сразу, без подтверждения) |
-| `Ctrl+Alt+D` | Удалить профиль (диалог с выбором и подтверждением) |
-| `Ctrl+Alt+N` | Создать новую группу для текущей вкладки |
-| `Ctrl+Alt+A` | Добавить текущую вкладку в существующую группу |
-| `Ctrl+Alt+O` | Интерактивно изменить порядок групп |
+| `Ctrl+Alt+T` | Open the group list; then press a digit `0`–`9` |
+| `Ctrl+Alt+0` | Collapse/expand **all** groups |
+| `Ctrl+Alt+1` … `Ctrl+Alt+9` | Collapse/expand the `i`-th group (expanding also switches to its first tab) |
+| `Alt+Shift+1` … `Alt+Shift+9` | Go to the **first tab** of the `i`-th group |
+| `Ctrl+Alt+S` | Save the window state into the extension storage |
+| `Ctrl+Alt+R` | Restore the window state from the storage |
+| `Ctrl+Alt+W` | Close every tab outside groups (pinned tabs excluded) |
+| `Ctrl+Alt+C` | Clear the active profile (immediately, without confirmation) |
+| `Ctrl+Alt+D` | Delete a profile (dialog with a picker and confirmation) |
+| `Ctrl+Alt+N` | Create a new group for the current tab |
+| `Ctrl+Alt+A` | Add the current tab to an existing group |
+| `Ctrl+Alt+O` | Reorder groups interactively |
 
-**Почему не `Ctrl+Alt+T+<цифра>`.** API `commands` в Firefox принимает только «модификатор (+ второй модификатор) + одна клавиша» — аккорды из двух клавиш зарегистрировать нельзя. Поэтому аккорд эмулируется: `Ctrl+Alt+T` открывает попап, который ждёт цифру `0`–`9`. Тот же результат дают прямые `Ctrl+Alt+0…9` — без промежуточного окна.
+**Why not `Ctrl+Alt+T+<digit>`.** The `commands` API in Firefox only accepts “modifier (+ a second modifier) + one key” — two-key chords cannot be registered. So the chord is emulated: `Ctrl+Alt+T` opens the popup, which waits for a digit `0`–`9`. The direct `Ctrl+Alt+0…9` shortcuts give the same result without the intermediate window.
 
-## Как это работает
+## How it works
 
-- **Нумерация групп.** Группы нумеруются по их позиции в панели вкладок слева направо (порядок берётся из индексов вкладок, а не из `tabGroups.query()`, который порядок не гарантирует). Хоткеями доступны первые девять, в попапе видны все.
-- **Область действия** — только текущее окно.
-- **Переход в группу** (`Alt+Shift+<цифра>`) активирует вкладку группы с наименьшим индексом в панели. Если группа свёрнута, она сначала разворачивается — иначе Firefox развернул бы её сам, но уже в момент активации вкладки. Нумерация та же, что у `Ctrl+Alt+<цифра>`.
-- **Разворачивание группы** (`Ctrl+Alt+<цифра>` на свёрнутой группе, а также клик по строке в попапе) не только раскрывает её, но и делает активной ту же первую вкладку. Отличие от `Alt+Shift+<цифра>` — повторное нажатие `Ctrl+Alt+<цифра>` группу сворачивает.
-- **Сворачивание группы с активной вкладкой.** Перед сворачиванием фокус переносится на первую вкладку **ближайшей развёрнутой группы** — той, что имеет наименьший номер среди оставшихся открытыми. Если сворачивается последняя открытая группа, в конце панели появляется вкладка на домашней странице (существующая пустая вкладка в конце переиспользуется).
-- **Сворачивание всех** (`Ctrl+Alt+0`) сначала открывает в конце панели новую вкладку вне групп на домашней странице (из `browserSettings.homepageOverride`; если домашняя не задана — обычная новая вкладка) и делает её активной, после чего сворачивает **все** группы, включая ту, в которой находилась активная вкладка. Если последняя вкладка окна уже вне групп и содержит домашнюю или пустую страницу, новая не плодится — просто активируется существующая.
-- **Разворачивание всех** (`Ctrl+Alt+0` при свёрнутых группах) раскрывает все группы, а затем, если активной была незакреплённая вкладка вне групп с пустой или домашней страницей, закрывает её и делает активной первую вкладку первой группы. Обычная вкладка вне групп с любым другим содержимым остаётся активной и не закрывается.
-- **Закрытие вкладок вне групп** (`Ctrl+Alt+W`) закрывает все вкладки окна, не входящие ни в одну группу. Закреплённые вкладки не трогаются. Если после закрытия в окне не осталось бы ни одной вкладки, команда отказывается работать — окно бы закрылось. Если активная вкладка закрывается, фокус заранее переносится на закреплённую вкладку или на вкладку из развёрнутой группы, чтобы Firefox не разворачивал свёрнутую группу.
-- **Нотификации.** Сохранение, восстановление, импорт снимка и закрытие вкладок вне групп показывают системную нотификацию с результатом (в дополнение к значку `✓`/`!` на иконке). Остальные команды по-прежнему отчитываются только значком.
-- **Сохранение** (`Ctrl+Alt+S`) полностью перезаписывает активный профиль в `storage.local`: в снимок попадают **только вкладки, состоящие в группах**. Всё, что вне групп, включая закреплённые вкладки, пропускается — число пропущенных показывается в сообщении. Вместе с группами пишется позиция каждой из них в панели.
-- **Восстановление** (`Ctrl+Alt+R`) сначала показывает диалог с диффом. После подтверждения вкладки снимка создаются и группируются в исходном порядке панели, затем закрываются все вкладки, которые были в окне до этого (включая закреплённые) — в результате остаётся ровно содержимое снимка. Новые вкладки создаются раньше, чем удаляются старые, поэтому окно не закрывается. Если закрыть какую-то из прежних вкладок не удалось, остальные всё равно закрываются — удаление идёт с фолбэком по одной вкладке.
-- **Очистка профиля** (`Ctrl+Alt+C`) стирает содержимое активного профиля: сам профиль остаётся в списке, но его снимок становится пустым (`groups: []`), и восстанавливать из него нечего. Подтверждения не спрашивает, результат — нотификация с тем, сколько групп и вкладок было стёрто. То же делает кнопка **⌫ Очистить активный** в диалоге **Профили / экспорт…**.
-- **Удаление профиля** (`Ctrl+Alt+D`) открывает диалог с выбором профиля и подтверждением: Enter удаляет, Esc отменяет. Удалить можно любой профиль, включая единственный — тогда в хранилище не остаётся ни одного снимка.
-- **Пересортировка** (`Ctrl+Alt+O`) применяет порядок последовательными `tabGroups.move(id, {index: -1})`.
+- **Group numbering.** Groups are numbered by their position in the tab strip, left to right (the order comes from tab indexes, not from `tabGroups.query()`, which guarantees no order). The first nine are reachable by shortcuts, the popup shows all of them.
+- **Scope** — the current window only.
+- **Going to a group** (`Alt+Shift+<digit>`) activates the tab of the group with the lowest index in the strip. If the group is collapsed, it is expanded first — otherwise Firefox would expand it itself, but only at the moment the tab is activated. The numbering is the same as for `Ctrl+Alt+<digit>`.
+- **Expanding a group** (`Ctrl+Alt+<digit>` on a collapsed group, and clicking a row in the popup) not only opens it but also activates that same first tab. The difference from `Alt+Shift+<digit>`: pressing `Ctrl+Alt+<digit>` again collapses the group.
+- **Collapsing a group that holds the active tab.** Before collapsing, focus moves to the first tab of the **nearest expanded group** — the one with the lowest number among the groups still open. If the last open group is being collapsed, a tab with the home page appears at the end of the strip (an existing empty tab at the end is reused).
+- **Collapsing everything** (`Ctrl+Alt+0`) first opens a new tab outside groups at the end of the strip on the home page (from `browserSettings.homepageOverride`; a plain new tab if no home page is set) and makes it active, then collapses **every** group, including the one that held the active tab. If the last tab of the window is already outside groups and holds the home page or a blank page, no new tab is spawned — the existing one is simply activated.
+- **Expanding everything** (`Ctrl+Alt+0` with collapsed groups) opens every group and then, if the active tab was an unpinned tab outside groups holding a blank or home page, closes it and activates the first tab of the first group. An ordinary tab outside groups with any other content stays active and is not closed.
+- **Closing tabs outside groups** (`Ctrl+Alt+W`) closes every tab of the window that belongs to no group. Pinned tabs are left alone. If closing would leave the window without a single tab, the command refuses to run — the window would close. If the active tab is among those closed, focus is moved beforehand to a pinned tab or to a tab from an expanded group, so that Firefox does not expand a collapsed one.
+- **Notifications.** Saving, restoring, importing a snapshot and closing tabs outside groups show a system notification with the result (in addition to the `✓`/`!` badge on the icon). The other commands still report through the badge only.
+- **Saving** (`Ctrl+Alt+S`) fully overwrites the active profile in `storage.local`: **only tabs that belong to a group** make it into the snapshot. Everything outside groups, pinned tabs included, is skipped — the number of skipped tabs is shown in the message. The position of each group in the strip is stored alongside it.
+- **Restoring** (`Ctrl+Alt+R`) shows a diff dialog first. After confirmation the snapshot tabs are created and grouped in the original strip order, then every tab that was in the window before is closed (pinned ones included) — what remains is exactly the snapshot contents. New tabs are created before the old ones are removed, so the window never closes. If some previous tab cannot be closed, the rest are closed anyway — removal falls back to one tab at a time.
+- **Clearing a profile** (`Ctrl+Alt+C`) wipes the contents of the active profile: the profile itself stays in the list, but its snapshot becomes empty (`groups: []`) and there is nothing to restore from it. It asks for no confirmation; the result is a notification with how many groups and tabs were wiped. The **⌫ Clear active** button in the **Profiles / export…** dialog does the same.
+- **Deleting a profile** (`Ctrl+Alt+D`) opens a dialog with a profile picker and a confirmation: Enter deletes, Esc cancels. Any profile can be deleted, including the only one — the storage is then left without a single snapshot.
+- **Reordering** (`Ctrl+Alt+O`) applies the order through successive `tabGroups.move(id, {index: -1})` calls.
+- **Interface language.** The extension is localized through the standard `_locales` mechanism: English is the default (`default_locale: "en"`), Russian is picked up automatically when the Firefox UI language is Russian. Every other locale gets the English strings. There is no language switch inside the extension: the language follows the Firefox language pack (`about:preferences` → Language) — the popup and dialogs, the notifications and the command descriptions in **Manage Extension Shortcuts** are all translated, and snapshot dates are formatted for the same locale.
 
-## Формат снимка
+## Snapshot format
 
 ```json
 {
@@ -83,7 +88,7 @@
   "savedAt": "2026-07-27T00:38:00.000Z",
   "groups": [
     {
-      "title": "работа",
+      "title": "work",
       "color": "blue",
       "collapsed": false,
       "position": 1,
@@ -98,130 +103,131 @@
 }
 ```
 
-`position` — индекс в панели вкладок на момент сохранения; по нему восстанавливается взаимный порядок групп и вкладок вне групп. Поле `name` — имя профиля, из которого сделан экспорт; при импорте оно подставляется по умолчанию.
+`position` is the index in the tab strip at the moment of saving; it restores the relative order of groups and of tabs outside groups. The `name` field is the profile the export was made from; on import it is used as the default name.
 
-Массив `ungrouped` при новых сохранениях **всегда пустой** — вкладки вне групп не сохраняются. Поле оставлено в формате ради совместимости: снимки, сделанные прежними версиями или пришедшие импортом, восстанавливаются вместе со своими вкладками вне групп.
+The `ungrouped` array is **always empty** in new saves — tabs outside groups are not stored. The field is kept in the format for compatibility: snapshots made by earlier versions or coming from an import are restored together with their tabs outside groups.
 
-## Профили снимков
+## Snapshot profiles
 
-Снимков может быть несколько, каждый со своим именем: `default`, `работа`, `чтение`. В `storage.local` они лежат в `snapshots` (объект «имя → снимок»), активный профиль — в `activeSnapshot`.
+There can be several snapshots, each with its own name: `default`, `work`, `reading`. In `storage.local` they live in `snapshots` (a “name → snapshot” object), the active profile is in `activeSnapshot`.
 
-- `Ctrl+Alt+S` пишет в **активный** профиль;
-- `Ctrl+Alt+R` открывает диалог, где профиль выбирается из выпадающего списка — дифф пересчитывается при переключении;
-- `Ctrl+Alt+C` очищает активный профиль, `Ctrl+Alt+D` удаляет выбранный;
-- активный профиль меняется кликом по строке в диалоге **Профили / экспорт…** (попап `Ctrl+Alt+T`);
-- удалить можно любой профиль, в том числе последний оставшийся.
+- `Ctrl+Alt+S` writes into the **active** profile;
+- `Ctrl+Alt+R` opens a dialog where the profile is picked from a dropdown — the diff is recalculated on every switch;
+- `Ctrl+Alt+C` clears the active profile, `Ctrl+Alt+D` deletes the selected one;
+- the active profile is changed by clicking a row in the **Profiles / export…** dialog (the `Ctrl+Alt+T` popup);
+- any profile can be deleted, including the last remaining one.
 
-Старое хранилище (единственный ключ `snapshot`) переносится в профиль `default` автоматически при первом обращении.
+The old storage layout (a single `snapshot` key) is migrated into the `default` profile automatically on first access.
 
-## Перенос на другой компьютер и хранение в git
+## Moving to another computer and keeping snapshots in git
 
-Кнопка **Профили / экспорт…** в попапе → выбрать профиль → **⤓ Экспорт в файл…**. Открывается системный диалог «Сохранить как…» (`downloads.download` с `saveAs: true`), поэтому файл можно положить сразу в каталог репозитория, не вынимая его из папки загрузок.
+The **Profiles / export…** button in the popup → pick a profile → **⤓ Export to file…**. A system “Save as…” dialog opens (`downloads.download` with `saveAs: true`), so the file can go straight into a repository directory without being fished out of the downloads folder.
 
-Имя файла стабильное, без таймстампа: профиль `default` → `tab-groups.json`, остальные → `tab-groups-<slug>.json`, где slug — имя профиля латиницей (кириллица транслитерируется: `работа` → `tab-groups-rabota.json`). Повторный экспорт поверх того же файла даёт нормальный `git diff` вместо пары add/delete.
+The file name is stable, without a timestamp: the `default` profile becomes `tab-groups.json`, the rest become `tab-groups-<slug>.json`, where the slug is the profile name in Latin letters (Cyrillic is transliterated: `работа` → `tab-groups-rabota.json`). Exporting again over the same file produces a normal `git diff` instead of an add/delete pair.
 
-На другой машине: **⤒ Импорт из файла** → выбрать JSON → имя профиля подставится из поля `name` в файле (или из имени файла) → **Импортировать** → `Ctrl+Alt+R` → выбрать профиль → **Восстановить**. Профиль с тем же именем перезаписывается.
+On the other machine: **⤒ Import from file** → pick the JSON → the profile name is taken from the `name` field in the file (or from the file name) → **Import** → `Ctrl+Alt+R` → pick the profile → **Restore**. A profile with the same name is overwritten.
 
-Учтите, что `savedAt`, `title` вкладок и флаг `active` меняются при каждом сохранении, поэтому diff содержит их даже когда набор вкладок тот же.
+Keep in mind that `savedAt`, the tab titles and the `active` flag change on every save, so the diff contains them even when the set of tabs is the same.
 
-## Установка не из исходников
+## Installing without the sources
 
-Всё выше описывает временную загрузку через `about:debugging`. Чтобы расширением мог пользоваться кто-то ещё — на постоянной основе и без возни с исходниками — пакет нужно собрать и **подписать у Mozilla**.
+Everything above describes the temporary load through `about:debugging`. For somebody else to use the extension — permanently and without touching the sources — the package has to be built and **signed by Mozilla**.
 
-Ключевое ограничение: обычный Firefox (Release, Beta, ESR) устанавливает только подписанные дополнения, отключить проверку в них нельзя (`xpinstall.signatures.required` работает лишь в Developer Edition, Nightly и ESR-сборках с unbranded-версией). Неподписанный `.xpi`, выложенный на GitHub, у стороннего пользователя просто не установится. Подпись бесплатна и делается через addons.mozilla.org (AMO) в обоих сценариях ниже — и когда расширение публикуется в каталоге, и когда раздаётся самостоятельно.
+The key constraint: ordinary Firefox (Release, Beta, ESR) installs signed add-ons only, and the check cannot be turned off there (`xpinstall.signatures.required` only works in Developer Edition, Nightly and unbranded ESR builds). An unsigned `.xpi` published on GitHub simply will not install for a third-party user. Signing is free and goes through addons.mozilla.org (AMO) in both scenarios below — both when the extension is published in the catalogue and when it is distributed on your own.
 
-### 0. Подготовка манифеста (один раз, до первой подписи)
+### 0. Preparing the manifest (once, before the first signature)
 
-- **Смените `browser_specific_settings.gecko.id`.** Сейчас это `tab-groups-control@local`. Нужен собственный уникальный идентификатор вида `tab-groups-control@ваш-домен.tld` или `{GUID}`. После первой публикации id менять нельзя — это будет уже другое дополнение.
-- **Поднимайте `version` перед каждой загрузкой** — AMO не принимает повторно уже загруженную версию (`just bump 1.3.0`).
-- `strict_min_version: "139.0"` и `data_collection_permissions: { required: ["none"] }` уже заполнены; второе с 2025 года обязательно для AMO.
+- **Change `browser_specific_settings.gecko.id`.** It is `tab-groups-control@local` right now. You need your own unique identifier such as `tab-groups-control@your-domain.tld` or a `{GUID}`. After the first publication the id cannot be changed — that would be a different add-on.
+- **Bump `version` before every upload** — AMO does not accept a version that has already been uploaded (`just bump 1.3.0`).
+- `strict_min_version: "139.0"` and `data_collection_permissions: { required: ["none"] }` are already filled in; the latter has been mandatory for AMO since 2025.
 
-### Рецепты `just`
+### `just` recipes
 
-Все шаги ниже завёрнуты в [`justfile`](justfile) — `just --list` покажет их список. Команды из следующих разделов приведены и в «сыром» виде, если `just` ставить не хочется.
+Every step below is wrapped in the [`justfile`](justfile) — `just --list` prints them. The commands from the next sections are also given in raw form, in case you would rather not install `just`.
 
-| Рецепт | Что делает |
+| Recipe | What it does |
 |---|---|
-| `just check` | `node --check` по всем скриптам + разбор `manifest.json` |
+| `just check` | `node --check` over every script + parsing `manifest.json` + comparing the locales |
+| `just locales` | verify that the key sets in `_locales/en` and `_locales/ru` match |
 | `just lint` | `web-ext lint` |
-| `just build` | `check` + `lint` + сборка ZIP без `README.md` и `justfile` |
-| `just zip` | запасная сборка тем же составом, обычным `zip`, без Node |
-| `just version` | текущая версия из манифеста |
-| `just bump 1.3.0` | поднять версию; откажет, если новая не больше текущей или формат не `x.y.z` |
-| `just credentials` | проверить, что заданы `WEB_EXT_API_KEY` и `WEB_EXT_API_SECRET` |
-| `just sign-unlisted` | подпись для самостоятельной раздачи → `.xpi` |
-| `just sign-listed` | отправка в каталог AMO |
-| `just xpi` | путь к последнему подписанному `.xpi` |
-| `just updates <user>/<repo>` | добавить текущую версию в `updates.json` |
-| `just release` | GitHub Release с `.xpi` (нужен `gh`) |
-| `just publish-unlisted <user>/<repo>` | `sign-unlisted` → `updates` → `release` одной командой |
-| `just clean` | удалить `web-ext-artifacts/` |
+| `just build` | `check` + `lint` + a ZIP without `README.md`, `README.ru.md` and `justfile` |
+| `just zip` | a fallback build with the same contents, using plain `zip`, without Node |
+| `just version` | the current version from the manifest |
+| `just bump 1.3.0` | raise the version; refuses if the new one is not greater or the format is not `x.y.z` |
+| `just credentials` | check that `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET` are set |
+| `just sign-unlisted` | signature for self-distribution → `.xpi` |
+| `just sign-listed` | submission to the AMO catalogue |
+| `just xpi` | path to the latest signed `.xpi` |
+| `just updates <user>/<repo>` | add the current version to `updates.json` |
+| `just release` | a GitHub Release with the `.xpi` (needs `gh`) |
+| `just publish-unlisted <user>/<repo>` | `sign-unlisted` → `updates` → `release` in one command |
+| `just clean` | remove `web-ext-artifacts/` |
 
-Ключи AMO рецепты читают из окружения; `justfile` подхватывает `.env` в каталоге расширения:
+The recipes read the AMO keys from the environment; the `justfile` picks up a `.env` in the extension directory:
 
 ```sh
 WEB_EXT_API_KEY=user:12345:67
 WEB_EXT_API_SECRET=...
 ```
 
-Этот файл нельзя коммитить — если каталог под git, добавьте `.env` в `.gitignore`.
+That file must never be committed — it is listed in `.gitignore`.
 
-### 1. Собрать пакет
+### 1. Build the package
 
-`web-ext` ставить в проект не нужно, достаточно `npx` (Node требуется только для этого шага):
+`web-ext` does not need to be installed into the project, `npx` is enough (Node is required for this step only):
 
 ```sh
 just build
 ```
 
-То же без `just` — сначала проверка манифеста и кода (обязательный шаг перед подписью), затем сборка в `web-ext-artifacts/tab_groups_control-1.2.0.zip`:
+The same without `just` — first the manifest and code check (a mandatory step before signing), then the build into `web-ext-artifacts/tab_groups_control-1.2.1.zip`:
 
 ```sh
 npx --yes web-ext lint
 npx --yes web-ext build
 ```
 
-`web-ext` сам исключает `.git`, `node_modules` и `web-ext-artifacts`. Рецепт `just build` дополнительно выбрасывает `README.md` и `justfile`, оставляя в пакете ровно восемь файлов расширения; голая команда `web-ext build` кладёт их внутрь — для этого есть флаг `--ignore-files README.md justfile`.
+`web-ext` excludes `.git`, `node_modules` and `web-ext-artifacts` by itself. The `just build` recipe additionally throws out `README.md`, `README.ru.md` and `justfile`, leaving only the extension files in the package; the bare `web-ext build` command puts them inside — that is what the `--ignore-files README.md README.ru.md justfile` flag is for.
 
-`lint` сейчас даёт **0 ошибок и 2 предупреждения**: `data_collection_permissions` появился в Firefox 140 (и 142 для Android), а в манифесте стоит `strict_min_version: "139.0"`. Подписи это не мешает — на 139 ключ просто игнорируется. Если предупреждения не нужны, поднимите `strict_min_version` до `"140.0"`, потеряв совместимость с 139.
+`lint` currently reports **0 errors and 2 warnings**: `data_collection_permissions` appeared in Firefox 140 (and 142 for Android), while the manifest says `strict_min_version: "139.0"`. This does not block signing — on 139 the key is simply ignored. If the warnings bother you, raise `strict_min_version` to `"140.0"` and lose compatibility with 139.
 
-Пакет — это обычный ZIP, так что собрать его можно и вовсе без Node: `just zip` (или вручную `zip -r -FS web-ext-artifacts/tab-groups-control-1.2.0.zip . -x '*.git*' 'web-ext-artifacts/*' justfile README.md updates.json`). Подписать такой ZIP всё равно придётся через AMO — там Node уже не нужен, загрузка идёт через Developer Hub.
+The package is a plain ZIP, so it can be built without Node at all: `just zip` (or manually `zip -r -FS web-ext-artifacts/tab-groups-control-1.2.1.zip . -x '*.git*' 'web-ext-artifacts/*' justfile README.md README.ru.md updates.json`). Such a ZIP still has to be signed through AMO — no Node is needed there, the upload goes through the Developer Hub.
 
-### 2. Опубликовать
+### 2. Publish
 
-Заведите аккаунт на [addons.mozilla.org](https://addons.mozilla.org/developers/) и в Developer Hub → **Manage API Keys** получите пару JWT issuer / secret.
+Create an account on [addons.mozilla.org](https://addons.mozilla.org/developers/) and get a JWT issuer / secret pair in Developer Hub → **Manage API Keys**.
 
-**Вариант A — каталог AMO (listed).** Расширение попадает в публичный поиск, обновления и подпись делает AMO.
+**Option A — the AMO catalogue (listed).** The extension appears in public search; AMO handles signing and updates.
 
 ```sh
 just sign-listed
 ```
 
-То же без `just`:
+The same without `just`:
 
 ```sh
 npx --yes web-ext sign --channel=listed \
   --api-key='user:12345:67' --api-secret='...'
 ```
 
-Либо загрузите ZIP вручную через Developer Hub → **Submit a New Add-on**. Первая публикация проходит ручное ревью (обычно дни); из-за разрешений `tabs`, `downloads` и `browserSettings` рецензент может запросить пояснения — исходники расширения открыты и не минифицированы, отдельный архив с исходниками прикладывать не требуется.
+Alternatively, upload the ZIP by hand through Developer Hub → **Submit a New Add-on**. The first publication goes through a manual review (usually days); because of the `tabs`, `downloads` and `browserSettings` permissions the reviewer may ask for clarifications — the sources are open and not minified, so a separate source archive is not required.
 
-**Вариант B — раздача у себя, GitHub Releases (unlisted).** В каталоге расширения нет, ссылку вы раздаёте сами; подпись автоматическая и занимает минуты.
+**Option B — self-distribution over GitHub Releases (unlisted).** The extension is not in the catalogue, you hand out the link yourself; signing is automatic and takes minutes.
 
 ```sh
 just sign-unlisted
 ```
 
-То же без `just`; на выходе `web-ext-artifacts/tab_groups_control-1.2.0.xpi` — уже подписанный:
+The same without `just`; the output `web-ext-artifacts/tab_groups_control-1.2.1.xpi` is already signed:
 
 ```sh
 npx --yes web-ext sign --channel=unlisted \
   --api-key='user:12345:67' --api-secret='...'
 ```
 
-Полученный `.xpi` приложите к GitHub Release: `just release` (обёртка над `gh release create` — сам подставит версию и путь к последнему `.xpi`) или вручную `gh release create v1.2.0 web-ext-artifacts/*.xpi`.
+Attach the resulting `.xpi` to a GitHub Release: `just release` (a wrapper over `gh release create` — it fills in the version and the path to the latest `.xpi`) or manually `gh release create v1.2.1 web-ext-artifacts/*.xpi`.
 
-**Автообновления при раздаче через GitHub.** Добавьте в `browser_specific_settings.gecko` поле `update_url`, указывающее на JSON в репозитории:
+**Auto-updates when distributing over GitHub.** Add an `update_url` field to `browser_specific_settings.gecko` pointing at a JSON in the repository:
 
 ```json
 "update_url": "https://raw.githubusercontent.com/<user>/<repo>/main/updates.json"
@@ -230,11 +236,11 @@ npx --yes web-ext sign --channel=unlisted \
 ```json
 {
   "addons": {
-    "tab-groups-control@ваш-домен.tld": {
+    "tab-groups-control@your-domain.tld": {
       "updates": [
         {
-          "version": "1.2.0",
-          "update_link": "https://github.com/<user>/<repo>/releases/download/v1.2.0/tab_groups_control-1.2.0.xpi"
+          "version": "1.2.1",
+          "update_link": "https://github.com/<user>/<repo>/releases/download/v1.2.1/tab_groups_control-1.2.1.xpi"
         }
       ]
     }
@@ -242,53 +248,56 @@ npx --yes web-ext sign --channel=unlisted \
 }
 ```
 
-Ссылки обязаны быть `https`. Запись за текущую версию добавляет `just updates <user>/<repo>` — файл создаётся при первом вызове, повторный запуск на той же версии не плодит дублей, а если `update_url` в манифесте ещё не прописан, рецепт напомнит строку для вставки. У listed-версии всего этого не нужно — обновления раздаёт AMO.
+The links must be `https`. The entry for the current version is added by `just updates <user>/<repo>` — the file is created on the first call, running it again on the same version does not produce duplicates, and if `update_url` is not in the manifest yet, the recipe prints the line to paste. The listed version needs none of this — AMO distributes the updates.
 
-Весь цикл самостоятельной раздачи — одной командой:
+The whole self-distribution cycle in one go:
 
 ```sh
 just bump 1.3.0
 just publish-unlisted <user>/<repo>
 ```
 
-### 3. Как устанавливает сторонний пользователь
+### 3. How a third-party user installs it
 
-**Если опубликовано в каталоге (вариант A):** открыть страницу расширения на addons.mozilla.org → **Добавить в Firefox** → подтвердить запрошенные разрешения. Обновления приходят автоматически.
+**If published in the catalogue (option A):** open the extension page on addons.mozilla.org → **Add to Firefox** → confirm the requested permissions. Updates arrive automatically.
 
-**Если раздаётся `.xpi` (вариант B):**
+**If an `.xpi` is handed out (option B):**
 
-1. Скачать `.xpi` со страницы релиза. Firefox предложит установку прямо по клику, только если сервер отдаёт тип `application/x-xpinstall`; GitHub отдаёт `application/octet-stream`, поэтому файл просто сохранится на диск — это нормально.
-2. Открыть `about:addons` → шестерёнка → **Установить дополнение из файла…** → выбрать скачанный `.xpi`.
-3. Подтвердить разрешения. Firefox проверит подпись; если файл не подписан, установка сорвётся с сообщением о непроверенном дополнении.
+1. Download the `.xpi` from the release page. Firefox offers to install it right on click only if the server serves the `application/x-xpinstall` type; GitHub serves `application/octet-stream`, so the file is simply saved to disk — that is normal.
+2. Open `about:addons` → gear icon → **Install Add-on From File…** → pick the downloaded `.xpi`.
+3. Confirm the permissions. Firefox verifies the signature; if the file is unsigned, the installation fails with a message about an unverified add-on.
 
-После установки хоткеи назначаются автоматически. Проверить и переназначить их: `about:addons` → шестерёнка → **Управление горячими клавишами расширений**. Напомните пользователю про конфликт `Ctrl+Alt+T` с системным терминалом в GNOME (см. выше).
+After installation the shortcuts are assigned automatically. To check and rebind them: `about:addons` → gear icon → **Manage Extension Shortcuts**. Remind the user about the `Ctrl+Alt+T` clash with the GNOME system terminal (see above).
 
-**Без подписи вообще** расширение можно поставить только двумя способами: временно через `about:debugging` (исчезает при перезапуске) или в Developer Edition / Nightly / unbranded-ESR, выставив `xpinstall.signatures.required` в `false` в `about:config`. Для раздачи другим людям оба варианта не годятся.
+**Without a signature at all** the extension can only be installed in two ways: temporarily through `about:debugging` (gone after a restart), or in Developer Edition / Nightly / unbranded ESR with `xpinstall.signatures.required` set to `false` in `about:config`. Neither is suitable for handing the extension to other people.
 
-## Известные ограничения
+## Known limitations
 
-- Служебные страницы (`about:config`, `about:addons`, `view-source:`, страницы других расширений) расширение открыть не может — при сохранении такие вкладки пропускаются, число пропущенных показывается в подсказке иконки.
-- После пересортировки групп вкладки вне групп оказываются левее всех групп.
-- Закреплённые вкладки в Firefox не входят в группы, поэтому они не сохраняются и при восстановлении закрываются вместе с остальными вкладками окна.
-- Если в снимке все группы свёрнуты, восстановление создаёт одну пустую вкладку вне групп на домашней странице — активной вкладке иначе негде находиться. Когда в снимке есть хотя бы одна развёрнутая группа, лишняя вкладка не появляется.
-- Добавление вкладки в свёрнутую группу разворачивает её — так устроен сам Firefox.
-- Восстановление создаёт вкладки заново — история навигации внутри вкладки и содержимое форм не сохраняются.
-- Данные временно загруженного расширения обычно переживают перезапуск браузера, но гарантий нет. Если снимок важен, экспортируйте его в файл или выставьте в `about:config` `keepUuidOnUninstall` и `keepStorageOnUninstall` в `true`.
-- Экспорт не запоминает каталог: путь каждый раз выбирается в системном диалоге (Firefox предлагает последний использованный). Автоматической записи файла при `Ctrl+Alt+S` нет — расширение не может писать по произвольному пути без явного подтверждения.
-- Имя файла строится транслитерацией, поэтому профили `работа` и `rabota` дадут одинаковое имя файла — при экспорте второй перезапишет первый, если сохранять в тот же каталог.
+- The extension cannot open internal pages (`about:config`, `about:addons`, `view-source:`, pages of other extensions) — such tabs are skipped when saving, and the number of skipped ones is shown in the icon tooltip.
+- After reordering groups, tabs outside groups end up to the left of every group.
+- Pinned tabs do not belong to groups in Firefox, so they are not saved and are closed together with the rest of the window tabs on restore.
+- If every group in the snapshot is collapsed, restoring creates one empty tab outside groups on the home page — the active tab has nowhere else to live. When the snapshot has at least one expanded group, no extra tab appears.
+- Adding a tab to a collapsed group expands it — that is how Firefox itself works.
+- Restoring creates the tabs from scratch — the navigation history inside a tab and the form contents are not preserved.
+- The data of a temporarily loaded extension usually survives a browser restart, but there is no guarantee. If a snapshot matters, export it to a file or set `keepUuidOnUninstall` and `keepStorageOnUninstall` to `true` in `about:config`.
+- The export does not remember the directory: the path is chosen in the system dialog every time (Firefox suggests the last used one). There is no automatic file write on `Ctrl+Alt+S` — an extension cannot write to an arbitrary path without an explicit confirmation.
+- The file name is built by transliteration, so the profiles `работа` and `rabota` produce the same file name — on export the second overwrites the first if both are saved into the same directory.
 
-## Состав
+## Contents
 
 ```
 manifest.json   MV3, permissions: tabs, tabGroups, storage, notifications, browserSettings, downloads
-background.js   команды, вся логика работы с группами, обработчик сообщений
-popup.html/js   попап Ctrl+Alt+T: список групп, цифры 0–9, кнопки снимка и профилей
-dialog.html/js  окно-диалог: new | add | order | restore | delete | file (профили, экспорт/импорт)
-common.css      общие стили
-justfile        рецепты сборки, подписи и публикации (в пакет не входит)
+background.js   commands, all the tab group logic, the message handler
+popup.html/js   the Ctrl+Alt+T popup: group list, digits 0–9, snapshot and profile buttons
+dialog.html/js  the dialog window: new | add | order | restore | delete | file (profiles, export/import)
+i18n.js         t() / uiLocale() / applyI18n() — string substitution driven by data-i18n attributes
+_locales/       en (default) and ru: interface strings, notifications and command descriptions
+common.css      shared styles
+justfile        build, signing and publishing recipes (not part of the package)
+README.ru.md    the Russian copy of this page (not part of the package)
 LICENSE         MIT
 ```
 
-## Лицензия
+## License
 
-[MIT](LICENSE). Политики Mozilla и AMO не ограничивают выбор лицензии для дополнений — требуется лишь, чтобы исходный код был доступен рецензенту, если сборка минифицирована или собрана из другого источника. Здесь код публикуется как есть, минификации нет, так что MIT ничему не противоречит.
+[MIT](LICENSE). Mozilla and AMO policies put no restrictions on the license of an add-on — all they require is that the source code be available to the reviewer if the build is minified or produced from another source. Here the code is published as is, with no minification, so MIT contradicts nothing.

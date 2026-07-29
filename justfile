@@ -14,14 +14,31 @@ check:
     @node --check background.js
     @node --check dialog.js
     @node --check popup.js
+    @node --check i18n.js
     @node -e "JSON.parse(require('fs').readFileSync('{{ manifest }}'))"
+    @just locales
     @echo "синтаксис в порядке"
+
+locales:
+    #!/usr/bin/env node
+    const fs = require("fs");
+    const read = (lang) => JSON.parse(fs.readFileSync(`_locales/${lang}/messages.json`, "utf8"));
+    const en = read("en");
+    const ru = read("ru");
+    const missing = Object.keys(en).filter((key) => !(key in ru));
+    const extra = Object.keys(ru).filter((key) => !(key in en));
+    if (missing.length || extra.length) {
+      if (missing.length) console.error("нет в ru: " + missing.join(", "));
+      if (extra.length) console.error("нет в en: " + extra.join(", "));
+      process.exit(1);
+    }
+    console.log(`локали в порядке: ключей ${Object.keys(en).length}`);
 
 lint:
     npx --yes web-ext lint
 
 build: check lint
-    npx --yes web-ext build --overwrite-dest --ignore-files justfile README.md
+    npx --yes web-ext build --overwrite-dest --ignore-files justfile README.md README.ru.md
     @ls -1 {{ artifacts }}/*.zip
 
 zip:
@@ -29,7 +46,7 @@ zip:
     @ver=$(sed -n 's/.*"version": "\([^"]*\)".*/\1/p' {{ manifest }} | head -1); \
       out="{{ artifacts }}/tab-groups-control-$ver.zip"; \
       rm -f "$out"; \
-      zip -r -FS "$out" . -x '*.git*' '{{ artifacts }}/*' 'justfile' 'README.md' 'updates.json' > /dev/null; \
+      zip -r -FS "$out" . -x '*.git*' '{{ artifacts }}/*' 'justfile' 'README.md' 'README.ru.md' 'updates.json' > /dev/null; \
       ls -1 "$out"
 
 credentials:
@@ -40,13 +57,13 @@ credentials:
 sign-unlisted: check lint credentials
     npx --yes web-ext sign --channel=unlisted \
         --api-key="$WEB_EXT_API_KEY" --api-secret="$WEB_EXT_API_SECRET" \
-        --ignore-files justfile README.md
+        --ignore-files justfile README.md README.ru.md
     @ls -1 {{ artifacts }}/*.xpi
 
 sign-listed: check lint credentials
     npx --yes web-ext sign --channel=listed \
         --api-key="$WEB_EXT_API_KEY" --api-secret="$WEB_EXT_API_SECRET" \
-        --ignore-files justfile README.md
+        --ignore-files justfile README.md README.ru.md
 
 bump new:
     #!/usr/bin/env node

@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="common.css" />
-    <title>Группы вкладок</title>
+    <title>Tab groups</title>
   </head>
   <body>
-    <h1>Группы вкладок</h1>
-    <p class="hint">Нажмите цифру 0–9 или выберите строку мышью.</p>
+    <h1 data-i18n="extActionTitle"></h1>
+    <p class="hint" data-i18n="popupHint"></p>
     <ul class="list" id="list"></ul>
     <div class="actions">
-      <button id="save">Сохранить (Ctrl+Alt+S)</button>
-      <button id="restore">Восстановить (Ctrl+Alt+R)</button>
-      <button id="close-ungrouped">Закрыть вне групп (Ctrl+Alt+W)</button>
-      <button id="file">Профили / экспорт…</button>
+      <button id="save" data-i18n="popupSave"></button>
+      <button id="restore" data-i18n="popupRestore"></button>
+      <button id="close-ungrouped" data-i18n="popupCloseUngrouped"></button>
+      <button id="file" data-i18n="popupProfiles"></button>
     </div>
     <p class="hint" id="saved"></p>
+    <script src="i18n.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

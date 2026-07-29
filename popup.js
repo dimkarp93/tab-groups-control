@@ -4,7 +4,7 @@ let state = { windowId: null, groups: [] };
 
 function formatDate(iso) {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString("ru-RU");
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString(uiLocale());
 }
 
 function makeRow(position, color, name, meta) {
@@ -47,10 +47,10 @@ async function render() {
   if (!state.groups.length) {
     const empty = document.createElement("li");
     empty.className = "empty";
-    empty.textContent = "В этом окне нет групп вкладок.";
+    empty.textContent = t("popupEmpty");
     list.append(empty);
   } else {
-    const all = makeRow(0, null, "Все группы", `${state.groups.length} шт.`);
+    const all = makeRow(0, null, t("popupAllGroups"), t("popupAllMeta", state.groups.length));
     all.querySelector(".dot").remove();
     list.append(all);
     state.groups.forEach((group, index) => {
@@ -59,17 +59,19 @@ async function render() {
         makeRow(
           position,
           group.color,
-          group.title || "Без имени",
-          `${group.count} · ${group.collapsed ? "свёрнута" : "развёрнута"}`
+          group.title || t("dlgNoName"),
+          `${group.count} · ${t(group.collapsed ? "popupCollapsed" : "popupExpanded")}`
         )
       );
     });
   }
 
-  const profile = state.activeProfile ? `Профиль «${state.activeProfile}»` : "Профиль не выбран";
+  const profile = state.activeProfile
+    ? t("popupProfileActive", state.activeProfile)
+    : t("popupProfileNone");
   savedLine.textContent = state.savedAt
-    ? `${profile} · снимок от ${formatDate(state.savedAt)}`
-    : `${profile} · снимок ещё не сохранён`;
+    ? t("popupSnapshotAt", profile, formatDate(state.savedAt))
+    : t("popupSnapshotNone", profile);
 }
 
 list.addEventListener("click", (event) => {
@@ -111,4 +113,5 @@ document.getElementById("file").addEventListener("click", async () => {
   window.close();
 });
 
+applyI18n();
 render();

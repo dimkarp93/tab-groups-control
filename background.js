@@ -129,7 +129,7 @@ async function applyCollapsed(windowId, groupIds, collapsed) {
 
 async function toggleAll(windowId) {
   const groups = await orderedGroups(windowId);
-  if (!groups.length) return { ok: false, message: "В этом окне нет групп вкладок" };
+  if (!groups.length) return { ok: false, message: t("msgNoGroups") };
   const collapse = groups.some((g) => !g.collapsed);
   if (collapse) await openLooseTab(windowId);
   for (const group of groups) {
@@ -138,7 +138,7 @@ async function toggleAll(windowId) {
   if (!collapse) await leaveLooseTab(windowId, groups[0].id);
   return {
     ok: true,
-    message: `${collapse ? "Свёрнуто" : "Развёрнуто"} групп: ${groups.length}`
+    message: t(collapse ? "msgCollapsedAll" : "msgExpandedAll", groups.length)
   };
 }
 
@@ -146,10 +146,10 @@ async function closeUngrouped(windowId) {
   const tabs = await browser.tabs.query({ windowId });
   tabs.sort((a, b) => a.index - b.index);
   const targets = tabs.filter((t) => isUngrouped(t) && !t.pinned);
-  if (!targets.length) return { ok: false, message: "Вкладок вне групп нет" };
+  if (!targets.length) return { ok: false, message: t("msgNoUngrouped") };
   const keep = tabs.filter((t) => !targets.includes(t));
   if (!keep.length) {
-    return { ok: false, message: "Все вкладки вне групп — окно закрылось бы целиком" };
+    return { ok: false, message: t("msgAllUngrouped") };
   }
 
   const active = tabs.find((t) => t.active);
@@ -164,32 +164,32 @@ async function closeUngrouped(windowId) {
   }
 
   await browser.tabs.remove(targets.map((t) => t.id));
-  return { ok: true, message: `Закрыто вкладок вне групп: ${targets.length}` };
+  return { ok: true, message: t("msgClosedUngrouped", targets.length) };
 }
 
 async function toggleNth(windowId, position) {
   const groups = await orderedGroups(windowId);
   const group = groups[position - 1];
-  if (!group) return { ok: false, message: `Группы №${position} нет в этом окне` };
+  if (!group) return { ok: false, message: t("msgNoGroupN", position) };
   await applyCollapsed(windowId, [group.id], !group.collapsed);
   if (group.collapsed) {
     const first = await firstTabInGroup(windowId, group.id);
     if (first) await browser.tabs.update(first.id, { active: true });
   }
-  const name = group.title || `группа ${position}`;
-  return { ok: true, message: `${group.collapsed ? "Развёрнута" : "Свёрнута"}: ${name}` };
+  const name = group.title || t("msgGroupFallbackName", position);
+  return { ok: true, message: t(group.collapsed ? "msgGroupExpanded" : "msgGroupCollapsed", name) };
 }
 
 async function focusNth(windowId, position) {
   const groups = await orderedGroups(windowId);
   const group = groups[position - 1];
-  if (!group) return { ok: false, message: `Группы №${position} нет в этом окне` };
+  if (!group) return { ok: false, message: t("msgNoGroupN", position) };
   const first = await firstTabInGroup(windowId, group.id);
-  const name = group.title || `группа ${position}`;
-  if (!first) return { ok: false, message: `В группе «${name}» нет вкладок` };
+  const name = group.title || t("msgGroupFallbackName", position);
+  if (!first) return { ok: false, message: t("msgGroupEmpty", name) };
   if (group.collapsed) await browser.tabGroups.update(group.id, { collapsed: false });
   await browser.tabs.update(first.id, { active: true });
-  return { ok: true, message: `Переход: ${name}` };
+  return { ok: true, message: t("msgFocused", name) };
 }
 
 function isRestorable(url) {
@@ -319,25 +319,25 @@ async function listProfiles() {
 async function setActiveProfile(name) {
   const { snapshots } = await readStore();
   const target = normalizeName(name);
-  if (!snapshots[target]) return { ok: false, message: `Профиля «${target}» нет` };
+  if (!snapshots[target]) return { ok: false, message: t("msgProfileMissing", target) };
   await browser.storage.local.set({ [ACTIVE_KEY]: target });
-  return { ok: true, message: `Активный профиль: ${target}` };
+  return { ok: true, message: t("msgActiveProfile", target) };
 }
 
 async function deleteProfile(name) {
   const { snapshots, active } = await readStore();
   const target = normalizeName(name);
-  if (!snapshots[target]) return { ok: false, message: `Профиля «${target}» нет` };
+  if (!snapshots[target]) return { ok: false, message: t("msgProfileMissing", target) };
   delete snapshots[target];
   const rest = Object.keys(snapshots);
   await writeStore(snapshots, rest.includes(active) ? active : rest[0] || DEFAULT_PROFILE);
-  return { ok: true, message: `Профиль удалён: ${target}` };
+  return { ok: true, message: t("msgProfileDeleted", target) };
 }
 
 async function clearProfile() {
   const { snapshots, active } = await readStore();
   const snapshot = snapshots[active];
-  if (!snapshot) return { ok: false, message: `Профиль «${active}» и так пуст` };
+  if (!snapshot) return { ok: false, message: t("msgProfileAlreadyEmpty", active) };
   const groups = snapshot.groups.length;
   const tabs = countTabs(snapshot);
   snapshots[active] = {
@@ -348,7 +348,7 @@ async function clearProfile() {
     ungrouped: []
   };
   await writeStore(snapshots, active);
-  return { ok: true, message: `Профиль «${active}» очищен: было групп ${groups}, вкладок ${tabs}` };
+  return { ok: true, message: t("msgProfileCleared", active, groups, tabs) };
 }
 
 async function writeProfile(name, snapshot) {
@@ -366,11 +366,10 @@ async function saveState(windowId, name) {
   const { snapshot, skipped, loose } = await buildSnapshot(windowId);
   await writeProfile(target, snapshot);
   const tail =
-    (loose ? `, вне групп пропущено: ${loose}` : "") +
-    (skipped ? `, пропущено служебных вкладок: ${skipped}` : "");
+    (loose ? t("msgSavedLoose", loose) : "") + (skipped ? t("msgSavedSkipped", skipped) : "");
   return {
     ok: true,
-    message: `Сохранено в «${target}»: групп ${snapshot.groups.length}, вкладок ${countTabs(snapshot)}${tail}`
+    message: t("msgSaved", target, snapshot.groups.length, countTabs(snapshot)) + tail
   };
 }
 
@@ -409,8 +408,8 @@ async function removeTabs(ids) {
 
 async function restoreSnapshot(windowId, name) {
   const snapshot = await readSnapshot(name);
-  if (!snapshot) return { ok: false, message: "Сохранённого состояния нет" };
-  if (!countTabs(snapshot)) return { ok: false, message: "Снимок пуст, ничего не восстановлено" };
+  if (!snapshot) return { ok: false, message: t("msgNoSnapshot") };
+  if (!countTabs(snapshot)) return { ok: false, message: t("msgSnapshotEmpty") };
 
   const oldIds = (await browser.tabs.query({ windowId })).map((t) => t.id);
   const collapse = [];
@@ -460,7 +459,7 @@ async function restoreSnapshot(windowId, name) {
   }
 
   if (!created.length) {
-    return { ok: false, message: "Не удалось открыть ни одной вкладки из снимка" };
+    return { ok: false, message: t("msgRestoreNothing") };
   }
 
   await browser.tabs.update(activeId ?? expandedId ?? created[0], { active: true });
@@ -471,11 +470,13 @@ async function restoreSnapshot(windowId, name) {
     await browser.tabGroups.update(groupId, { collapsed: true });
   }
 
-  const tail = failed ? `, не открылось: ${failed}` : "";
-  const label = snapshot.name ? `«${snapshot.name}»: ` : "";
+  const tail = failed ? t("msgRestoredFailed", failed) : "";
   return {
     ok: true,
-    message: `Восстановлено ${label}групп ${snapshot.groups.length}, вкладок ${created.length}${tail}`
+    message:
+      (snapshot.name
+        ? t("msgRestored", snapshot.name, snapshot.groups.length, created.length)
+        : t("msgRestoredUnnamed", snapshot.groups.length, created.length)) + tail
   };
 }
 
@@ -485,31 +486,31 @@ async function createGroup(windowId, tabId, title, color) {
     title: title || "",
     color: COLORS.includes(color) ? color : "blue"
   });
-  return { ok: true, message: `Создана группа: ${title || "без имени"}` };
+  return { ok: true, message: t("msgGroupCreated", title || t("msgUnnamedGroup")) };
 }
 
 async function addToGroup(tabId, groupId) {
   await browser.tabs.group({ tabIds: [tabId], groupId });
   const group = await browser.tabGroups.get(groupId);
-  return { ok: true, message: `Вкладка добавлена в группу: ${group.title || "без имени"}` };
+  return { ok: true, message: t("msgTabAdded", group.title || t("msgUnnamedGroup")) };
 }
 
 async function reorderGroups(windowId, order) {
   for (const groupId of order) {
     await browser.tabGroups.move(groupId, { index: -1 });
   }
-  return { ok: true, message: `Порядок групп обновлён: ${order.length}` };
+  return { ok: true, message: t("msgOrderUpdated", order.length) };
 }
 
 async function flash(ok, message) {
   await browser.action.setBadgeText({ text: ok ? "✓" : "!" });
   await browser.action.setBadgeBackgroundColor({ color: ok ? "#1f8b3a" : "#b3261e" });
-  await browser.action.setTitle({ title: `Группы вкладок — ${message}` });
+  await browser.action.setTitle({ title: t("badgeTitle", message) });
   if (badgeTimer !== null) clearTimeout(badgeTimer);
   badgeTimer = setTimeout(() => {
     badgeTimer = null;
     browser.action.setBadgeText({ text: "" });
-    browser.action.setTitle({ title: "Группы вкладок" });
+    browser.action.setTitle({ title: t("extActionTitle") });
   }, 2500);
 }
 
@@ -517,7 +518,7 @@ async function notify(ok, message) {
   try {
     await browser.notifications.create(`tab-groups-${Date.now()}`, {
       type: "basic",
-      title: ok ? "Группы вкладок" : "Группы вкладок — не выполнено",
+      title: t(ok ? "notifyTitle" : "notifyTitleFail"),
       message
     });
   } catch (error) {
@@ -574,7 +575,7 @@ async function runCommand(command) {
 
   if (command === "restore-state") {
     const { profiles } = await listProfiles();
-    if (!profiles.length) return announce({ ok: false, message: "Сохранённого состояния нет" });
+    if (!profiles.length) return announce({ ok: false, message: t("msgNoSnapshot") });
     return openDialog("restore", { windowId }, 460, 440);
   }
 
@@ -582,7 +583,7 @@ async function runCommand(command) {
 
   if (command === "delete-profile") {
     const { profiles } = await listProfiles();
-    if (!profiles.length) return announce({ ok: false, message: "Профилей нет" });
+    if (!profiles.length) return announce({ ok: false, message: t("msgNoProfiles") });
     return openDialog("delete", { windowId }, 420, 360);
   }
 
@@ -596,14 +597,14 @@ async function runCommand(command) {
     const tab = await activeTab(windowId);
     if (!tab) return;
     const groups = await orderedGroups(windowId);
-    if (!groups.length) return flashResult({ ok: false, message: "В этом окне нет групп вкладок" });
+    if (!groups.length) return flashResult({ ok: false, message: t("msgNoGroups") });
     return openDialog("add", { windowId, tabId: tab.id }, 420, 420);
   }
 
   if (command === "reorder-groups") {
     const groups = await orderedGroups(windowId);
     if (groups.length < 2) {
-      return flashResult({ ok: false, message: "Для пересортировки нужно минимум две группы" });
+      return flashResult({ ok: false, message: t("msgNeedTwoGroups") });
     }
     return openDialog("order", { windowId }, 420, 480);
   }
@@ -706,13 +707,17 @@ async function handleMessage(message) {
     }
     case "write-snapshot": {
       if (!isValidSnapshot(message.snapshot)) {
-        return announce({ ok: false, message: "Файл не похож на снимок групп вкладок" });
+        return announce({ ok: false, message: t("msgBadSnapshotFile") });
       }
       const { target, existed } = await writeProfile(message.name, message.snapshot);
-      const verb = existed ? "Перезаписан профиль" : "Создан профиль";
       return announce({
         ok: true,
-        message: `${verb} «${target}»: групп ${message.snapshot.groups.length}, вкладок ${countTabs(message.snapshot)}`
+        message: t(
+          existed ? "msgProfileOverwritten" : "msgProfileCreated",
+          target,
+          message.snapshot.groups.length,
+          countTabs(message.snapshot)
+        )
       });
     }
     case "open-dialog": {
@@ -724,7 +729,7 @@ async function handleMessage(message) {
       return { ok: true };
     }
     default:
-      return { ok: false, message: `Неизвестное сообщение: ${message.type}` };
+      return { ok: false, message: t("msgUnknownMessage", message.type) };
   }
 }
 

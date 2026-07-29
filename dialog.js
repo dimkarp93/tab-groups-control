@@ -11,21 +11,25 @@ const cancelEl = document.getElementById("cancel");
 
 let apply = async () => {};
 
-const COLOR_NAMES = {
-  blue: "синий",
-  cyan: "голубой",
-  green: "зелёный",
-  grey: "серый",
-  orange: "оранжевый",
-  pink: "розовый",
-  purple: "фиолетовый",
-  red: "красный",
-  yellow: "жёлтый"
+const COLOR_KEYS = {
+  blue: "colorBlue",
+  cyan: "colorCyan",
+  green: "colorGreen",
+  grey: "colorGrey",
+  orange: "colorOrange",
+  pink: "colorPink",
+  purple: "colorPurple",
+  red: "colorRed",
+  yellow: "colorYellow"
 };
+
+function colorName(color) {
+  return COLOR_KEYS[color] ? t(COLOR_KEYS[color]) : color;
+}
 
 function formatDate(iso) {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString("ru-RU");
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString(uiLocale());
 }
 
 function groupRow(group, position) {
@@ -46,11 +50,11 @@ function groupRow(group, position) {
 
   const name = document.createElement("span");
   name.className = "name";
-  name.textContent = group.title || "Без имени";
+  name.textContent = group.title || t("dlgNoName");
 
   const meta = document.createElement("span");
   meta.className = "meta";
-  meta.textContent = `${group.count} вкл.`;
+  meta.textContent = t("dlgGroupMeta", group.count);
 
   row.append(key, dot, name, meta);
   item.append(row);
@@ -58,29 +62,29 @@ function groupRow(group, position) {
 }
 
 async function setupNew() {
-  titleEl.textContent = "Новая группа для текущей вкладки";
-  hintEl.textContent = "Enter — создать, Esc — отмена. Цвет — клик или стрелки.";
-  applyEl.textContent = "Создать";
+  titleEl.textContent = t("dlgNewTitle");
+  hintEl.textContent = t("dlgNewHint");
+  applyEl.textContent = t("dlgNewApply");
 
   const { colors, groups } = await browser.runtime.sendMessage({ type: "groups", windowId });
   const used = new Set(groups.map((group) => group.color));
 
   const nameLabel = document.createElement("label");
-  nameLabel.textContent = "Название группы";
+  nameLabel.textContent = t("dlgNewNameLabel");
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = "Например: работа";
+  input.placeholder = t("dlgNewNamePlaceholder");
   nameLabel.append(input);
 
   const colorField = document.createElement("div");
   colorField.className = "field";
   const colorTitle = document.createElement("div");
   colorTitle.className = "field-title";
-  colorTitle.textContent = "Цвет";
+  colorTitle.textContent = t("dlgColorTitle");
   const grid = document.createElement("div");
   grid.className = "swatches";
   grid.setAttribute("role", "group");
-  grid.setAttribute("aria-label", "Цвет группы");
+  grid.setAttribute("aria-label", t("dlgColorGroupLabel"));
 
   const free = colors.filter((color) => !used.has(color));
   let selected = free.length ? free[0] : colors[0];
@@ -92,7 +96,7 @@ async function setupNew() {
     button.dataset.color = color;
     if (used.has(color)) {
       button.classList.add("used");
-      button.title = "Цвет уже используется в этом окне";
+      button.title = t("dlgColorUsed");
     }
 
     const box = document.createElement("span");
@@ -100,7 +104,7 @@ async function setupNew() {
 
     const name = document.createElement("span");
     name.className = "swatch-name";
-    name.textContent = COLOR_NAMES[color] || color;
+    name.textContent = colorName(color);
 
     button.append(box, name);
     button.addEventListener("click", () => choose(color));
@@ -143,9 +147,9 @@ async function setupNew() {
 }
 
 async function setupAdd() {
-  titleEl.textContent = "Добавить вкладку в группу";
-  hintEl.textContent = "Цифра, стрелки + Enter или клик мышью.";
-  applyEl.textContent = "Добавить";
+  titleEl.textContent = t("dlgAddTitle");
+  hintEl.textContent = t("dlgAddHint");
+  applyEl.textContent = t("dlgAddApply");
 
   const { groups } = await browser.runtime.sendMessage({ type: "groups", windowId });
   const list = document.createElement("ul");
@@ -195,9 +199,9 @@ async function setupAdd() {
 }
 
 async function setupOrder() {
-  titleEl.textContent = "Порядок групп вкладок";
-  hintEl.textContent = "Перетаскивайте строки мышью или двигайте кнопками ↑ ↓, затем «Применить».";
-  applyEl.textContent = "Применить";
+  titleEl.textContent = t("dlgOrderTitle");
+  hintEl.textContent = t("dlgOrderHint");
+  applyEl.textContent = t("dlgOrderApply");
 
   const { groups } = await browser.runtime.sendMessage({ type: "groups", windowId });
   const list = document.createElement("ul");
@@ -218,11 +222,11 @@ async function setupOrder() {
     const up = document.createElement("button");
     up.className = "icon";
     up.textContent = "↑";
-    up.title = "Выше";
+    up.title = t("dlgOrderUp");
     const down = document.createElement("button");
     down.className = "icon";
     down.textContent = "↓";
-    down.title = "Ниже";
+    down.title = t("dlgOrderDown");
 
     up.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -265,9 +269,9 @@ async function setupOrder() {
 }
 
 async function setupRestore() {
-  titleEl.textContent = "Восстановление состояния";
-  hintEl.textContent = "Текущие вкладки этого окна будут закрыты и заменены снимком.";
-  applyEl.textContent = "Восстановить";
+  titleEl.textContent = t("dlgRestoreTitle");
+  hintEl.textContent = t("dlgRestoreHint");
+  applyEl.textContent = t("dlgRestoreApply");
 
   const first = await browser.runtime.sendMessage({ type: "restore-preview", windowId });
   let selected = first.name;
@@ -276,12 +280,12 @@ async function setupRestore() {
   picker.className = "field";
   const pickerTitle = document.createElement("div");
   pickerTitle.className = "field-title";
-  pickerTitle.textContent = "Профиль";
+  pickerTitle.textContent = t("dlgProfileTitle");
   const select = document.createElement("select");
   for (const profile of first.profiles) {
     const option = document.createElement("option");
     option.value = profile.name;
-    option.textContent = `${profile.name} — ${profile.groups} гр., ${profile.tabs} вкл.`;
+    option.textContent = t("dlgProfileOption", profile.name, profile.groups, profile.tabs);
     option.selected = profile.name === selected;
     select.append(option);
   }
@@ -293,12 +297,12 @@ async function setupRestore() {
   const render = (data) => {
     preview.textContent = "";
     if (!data.snapshot) {
-      preview.textContent = "Сохранённого состояния нет.";
+      preview.textContent = t("dlgRestoreNoSnapshot");
       applyEl.disabled = true;
       return;
     }
     if (!data.snapshot.tabs) {
-      preview.textContent = "Профиль пуст — восстанавливать нечего.";
+      preview.textContent = t("dlgRestoreEmpty");
       applyEl.disabled = true;
       return;
     }
@@ -309,12 +313,12 @@ async function setupRestore() {
     const saved = document.createElement("div");
     const savedDate = document.createElement("b");
     savedDate.textContent = formatDate(data.snapshot.savedAt);
-    saved.append("Снимок от ", savedDate);
+    saved.append(`${t("dlgRestoreSavedAt")} `, savedDate);
     const plus = document.createElement("div");
-    const loose = data.snapshot.ungrouped ? ` (вне групп: ${data.snapshot.ungrouped})` : "";
-    plus.textContent = `+ открыть: ${data.snapshot.tabs} вкл. в ${data.snapshot.groups.length} гр.${loose}`;
+    const loose = data.snapshot.ungrouped ? t("dlgRestoreLoose", data.snapshot.ungrouped) : "";
+    plus.textContent = t("dlgRestorePlus", data.snapshot.tabs, data.snapshot.groups.length) + loose;
     const minus = document.createElement("div");
-    minus.textContent = `− закрыть: ${data.current.tabs} текущих вкл. (${data.current.groups} гр.)`;
+    minus.textContent = t("dlgRestoreMinus", data.current.tabs, data.current.groups);
     diff.append(saved, plus, minus);
 
     const list = document.createElement("ul");
@@ -347,9 +351,9 @@ async function setupRestore() {
 }
 
 async function setupDelete() {
-  titleEl.textContent = "Удаление профиля";
-  hintEl.textContent = "Enter — удалить безвозвратно, Esc — отмена.";
-  applyEl.textContent = "Удалить";
+  titleEl.textContent = t("dlgDeleteTitle");
+  hintEl.textContent = t("dlgDeleteHint");
+  applyEl.textContent = t("dlgDeleteApply");
 
   const { active, profiles } = await browser.runtime.sendMessage({ type: "list-snapshots" });
   let selected = active;
@@ -358,12 +362,12 @@ async function setupDelete() {
   picker.className = "field";
   const pickerTitle = document.createElement("div");
   pickerTitle.className = "field-title";
-  pickerTitle.textContent = "Профиль";
+  pickerTitle.textContent = t("dlgProfileTitle");
   const select = document.createElement("select");
   for (const profile of profiles) {
     const option = document.createElement("option");
     option.value = profile.name;
-    option.textContent = `${profile.name} — ${profile.groups} гр., ${profile.tabs} вкл.`;
+    option.textContent = t("dlgProfileOption", profile.name, profile.groups, profile.tabs);
     option.selected = profile.name === selected;
     select.append(option);
   }
@@ -378,18 +382,18 @@ async function setupDelete() {
     details.textContent = "";
     if (!profile) {
       applyEl.disabled = true;
-      details.textContent = "Профилей нет.";
+      details.textContent = t("dlgDeleteNone");
       return;
     }
     applyEl.disabled = false;
     const line = document.createElement("div");
     const name = document.createElement("b");
     name.textContent = profile.name;
-    line.append("Будет удалён профиль ", name);
+    line.append(`${t("dlgDeleteLine")} `, name);
     const meta = document.createElement("div");
-    meta.textContent = `${profile.groups} гр., ${profile.tabs} вкл., снимок от ${formatDate(profile.savedAt)}`;
+    meta.textContent = t("dlgDeleteMeta", profile.groups, profile.tabs, formatDate(profile.savedAt));
     const warn = document.createElement("div");
-    warn.textContent = "Отменить удаление нельзя.";
+    warn.textContent = t("dlgDeleteWarn");
     details.append(line, meta, warn);
   };
 
@@ -455,18 +459,18 @@ async function downloadSnapshot(snapshot, name, status) {
       }
     };
     browser.downloads.onChanged.addListener(done);
-    status.textContent = `Экспорт «${name}» → ${fileNameFor(name)}`;
+    status.textContent = t("dlgFileExported", name, fileNameFor(name));
   } catch (error) {
     URL.revokeObjectURL(url);
-    status.textContent = "Экспорт отменён";
+    status.textContent = t("dlgFileExportCancelled");
   }
 }
 
 async function setupFile() {
-  titleEl.textContent = "Профили снимков: экспорт и импорт";
-  hintEl.textContent = "Клик по строке делает профиль активным — в него пишет Ctrl+Alt+S.";
+  titleEl.textContent = t("dlgFileTitle");
+  hintEl.textContent = t("dlgFileHint");
   applyEl.hidden = true;
-  cancelEl.textContent = "Закрыть (Esc)";
+  cancelEl.textContent = t("dlgFileClose");
 
   const status = document.createElement("p");
   status.className = "hint";
@@ -477,28 +481,28 @@ async function setupFile() {
   buttons.className = "actions";
   buttons.style.borderTop = "none";
   const exportButton = document.createElement("button");
-  exportButton.textContent = "⤓ Экспорт в файл…";
+  exportButton.textContent = t("dlgFileExport");
   const clearButton = document.createElement("button");
-  clearButton.textContent = "⌫ Очистить активный";
+  clearButton.textContent = t("dlgFileClear");
   const deleteButton = document.createElement("button");
-  deleteButton.textContent = "✕ Удалить профиль";
+  deleteButton.textContent = t("dlgFileDelete");
   buttons.append(exportButton, clearButton, deleteButton);
 
   const importField = document.createElement("div");
   importField.className = "field";
   const importTitle = document.createElement("div");
   importTitle.className = "field-title";
-  importTitle.textContent = "⤒ Импорт из файла";
+  importTitle.textContent = t("dlgFileImportTitle");
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = "application/json,.json";
   const nameInput = document.createElement("input");
   fileInput.style.marginBottom = "6px";
   nameInput.type = "text";
-  nameInput.placeholder = "Имя профиля";
+  nameInput.placeholder = t("dlgFileNamePlaceholder");
   nameInput.disabled = true;
   const importButton = document.createElement("button");
-  importButton.textContent = "Импортировать";
+  importButton.textContent = t("dlgFileImportButton");
   importButton.disabled = true;
   importButton.style.marginTop = "6px";
   importField.append(importTitle, fileInput, nameInput, importButton);
@@ -516,7 +520,7 @@ async function setupFile() {
     if (!profiles.length) {
       const empty = document.createElement("li");
       empty.className = "empty";
-      empty.textContent = "Профилей пока нет — сохраните состояние (Ctrl+Alt+S).";
+      empty.textContent = t("dlgFileNoProfiles");
       list.append(empty);
       exportButton.disabled = true;
       clearButton.disabled = true;
@@ -540,7 +544,7 @@ async function setupFile() {
       const key = document.createElement("span");
       key.className = "key";
       key.textContent = profile.name === active ? "✓" : "·";
-      key.title = profile.name === active ? "Активный профиль" : "";
+      key.title = profile.name === active ? t("dlgFileActiveMark") : "";
 
       const title = document.createElement("span");
       title.className = "name";
@@ -548,7 +552,12 @@ async function setupFile() {
 
       const meta = document.createElement("span");
       meta.className = "meta";
-      meta.textContent = `${profile.groups} гр. · ${profile.tabs} вкл. · ${formatDate(profile.savedAt)}`;
+      meta.textContent = t(
+        "dlgFileProfileMeta",
+        profile.groups,
+        profile.tabs,
+        formatDate(profile.savedAt)
+      );
 
       row.append(key, title, meta);
       item.append(row);
@@ -571,7 +580,7 @@ async function setupFile() {
   exportButton.addEventListener("click", async () => {
     const { snapshot } = await browser.runtime.sendMessage({ type: "read-snapshot", name: selected });
     if (!snapshot) {
-      status.textContent = "Профиль пуст";
+      status.textContent = t("dlgFileEmptyProfile");
       return;
     }
     await downloadSnapshot(snapshot, selected, status);
@@ -599,13 +608,13 @@ async function setupFile() {
     try {
       parsed = JSON.parse(await file.text());
     } catch (error) {
-      status.textContent = "Не удалось разобрать JSON";
+      status.textContent = t("dlgFileBadJson");
       return;
     }
     nameInput.value = parsed.name || profileFromFileName(file.name) || "imported";
     nameInput.disabled = false;
     importButton.disabled = false;
-    status.textContent = `Файл прочитан, профиль «${nameInput.value}» — нажмите «Импортировать»`;
+    status.textContent = t("dlgFileRead", nameInput.value);
   });
 
   importButton.addEventListener("click", async () => {
@@ -627,7 +636,7 @@ async function setupFile() {
   });
 
   await render();
-  status.textContent = status.textContent || "Выберите профиль в списке";
+  status.textContent = status.textContent || t("dlgFilePick");
 }
 
 const setups = {
@@ -649,7 +658,9 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+applyI18n();
+
 (setups[mode] || (async () => {
-  titleEl.textContent = "Неизвестный режим";
+  titleEl.textContent = t("dlgUnknownMode");
   applyEl.hidden = true;
 }))();
