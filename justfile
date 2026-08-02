@@ -37,6 +37,11 @@ locales:
 lint:
     npx --yes web-ext lint
 
+run lang="":
+    npx --yes web-ext run --firefox=firefox-esr \
+        {{ if lang == "" { "" } else if lang == "en" { "--pref=intl.locale.requested=en-US" } else { "--pref=intl.locale.requested=" + lang } }} \
+        --start-url 'about:debugging#/runtime/this-firefox'
+
 build: check lint
     npx --yes web-ext build --overwrite-dest --ignore-files justfile README.md README.ru.md
     @ls -1 {{ artifacts }}/*.zip

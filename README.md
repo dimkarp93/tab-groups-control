@@ -78,7 +78,7 @@ In many Linux environments (GNOME, Ubuntu) `Ctrl+Alt+T` is grabbed by the system
 - **Clearing a profile** (`Ctrl+Alt+C`) wipes the contents of the active profile: the profile itself stays in the list, but its snapshot becomes empty (`groups: []`) and there is nothing to restore from it. It asks for no confirmation; the result is a notification with how many groups and tabs were wiped. The **⌫ Clear active** button in the **Profiles / export…** dialog does the same.
 - **Deleting a profile** (`Ctrl+Alt+D`) opens a dialog with a profile picker and a confirmation: Enter deletes, Esc cancels. Any profile can be deleted, including the only one — the storage is then left without a single snapshot.
 - **Reordering** (`Ctrl+Alt+O`) applies the order through successive `tabGroups.move(id, {index: -1})` calls.
-- **Interface language.** The extension is localized through the standard `_locales` mechanism: English is the default (`default_locale: "en"`), Russian is picked up automatically when the Firefox UI language is Russian. Every other locale gets the English strings. There is no language switch inside the extension: the language follows the Firefox language pack (`about:preferences` → Language) — the popup and dialogs, the notifications and the command descriptions in **Manage Extension Shortcuts** are all translated, and snapshot dates are formatted for the same locale.
+- **Interface language.** The extension is localized through the standard `_locales` mechanism: English is the default (`default_locale: "en"`), Russian is picked up automatically when the Firefox UI language is Russian. Every other locale gets the English strings. There is no language switch inside the extension: the language follows the Firefox language pack (`about:preferences` → Language) — the popup and dialogs, the notifications and the command descriptions in **Manage Extension Shortcuts** are all translated, and snapshot dates are formatted for the same locale. The catalogue is picked once, when the extension is loaded: changing the Firefox language afterwards does nothing until the extension is reloaded. `browser.i18n.getUILanguage()` and `getMessage("@@ui_locale")` both report the application locale, not the catalogue that was actually loaded — the honest check is `browser.i18n.getMessage("localeTag")`, a service key that holds `en` or `ru`. To look at another language without touching your own profile, use `just run en` / `just run ru`.
 
 ## Snapshot format
 
@@ -150,6 +150,7 @@ Every step below is wrapped in the [`justfile`](justfile) — `just --list` prin
 | `just check` | `node --check` over every script + parsing `manifest.json` + comparing the locales |
 | `just locales` | verify that the key sets in `_locales/en` and `_locales/ru` match |
 | `just lint` | `web-ext lint` |
+| `just run` | a separate Firefox on a throwaway profile with the extension already loaded; `just run en` / `just run ru` force the interface language |
 | `just build` | `check` + `lint` + a ZIP without `README.md`, `README.ru.md` and `justfile` |
 | `just zip` | a fallback build with the same contents, using plain `zip`, without Node |
 | `just version` | the current version from the manifest |

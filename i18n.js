@@ -18,6 +18,6 @@ function applyI18n(root = document) {
   }
   if (root === document) {
     document.title = t("extActionTitle");
-    document.documentElement.lang = uiLocale();
+    document.documentElement.lang = t("localeTag");
   }
 }

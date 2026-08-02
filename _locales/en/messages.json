@@ -1,4 +1,6 @@
 {
+  "localeTag": { "message": "en" },
+
   "extDescription": {
     "message": "Keyboard control for native Firefox tab groups: collapsing, saving and restoring window state, creating and reordering groups."
   },
