@@ -1,5 +1,4 @@
 const NONE = browser.tabGroups.TAB_GROUP_ID_NONE;
-const SNAPSHOT_KEY = "snapshot";
 const STORE_KEY = "snapshots";
 const ACTIVE_KEY = "activeSnapshot";
 const DEFAULT_PROFILE = "default";
@@ -268,7 +267,7 @@ function normalizeName(value) {
 }
 
 async function readStore() {
-  const stored = await browser.storage.local.get([STORE_KEY, ACTIVE_KEY, SNAPSHOT_KEY]);
+  const stored = await browser.storage.local.get([STORE_KEY, ACTIVE_KEY]);
   const snapshots = {};
   const raw = stored[STORE_KEY];
   if (raw && typeof raw === "object") {
@@ -276,18 +275,9 @@ async function readStore() {
       if (isValidSnapshot(snapshot)) snapshots[name] = snapshot;
     }
   }
-  let migrated = false;
-  if (!Object.keys(snapshots).length && isValidSnapshot(stored[SNAPSHOT_KEY])) {
-    snapshots[DEFAULT_PROFILE] = { ...stored[SNAPSHOT_KEY], name: DEFAULT_PROFILE };
-    migrated = true;
-  }
   const names = Object.keys(snapshots);
   let active = typeof stored[ACTIVE_KEY] === "string" ? stored[ACTIVE_KEY] : null;
   if (!active || !snapshots[active]) active = names[0] || DEFAULT_PROFILE;
-  if (migrated) {
-    await browser.storage.local.set({ [STORE_KEY]: snapshots, [ACTIVE_KEY]: active });
-    await browser.storage.local.remove(SNAPSHOT_KEY);
-  }
   return { snapshots, active };
 }
 
