@@ -5,6 +5,7 @@ const DEFAULT_PROFILE = "default";
 const COLORS = ["blue", "cyan", "green", "grey", "orange", "pink", "purple", "red", "yellow"];
 
 let dialogWindowId = null;
+let helpWindowId = null;
 let badgeTimer = null;
 
 async function targetWindowId() {
@@ -543,11 +544,34 @@ async function openDialog(mode, params, width, height) {
   dialogWindowId = created.id;
 }
 
+async function openHelp() {
+  if (helpWindowId !== null) {
+    try {
+      await browser.windows.update(helpWindowId, { focused: true });
+      return;
+    } catch (error) {
+      helpWindowId = null;
+    }
+  }
+  const url = new URL(browser.runtime.getURL("dialog.html"));
+  url.searchParams.set("mode", "help");
+  const created = await browser.windows.create({
+    url: url.href,
+    type: "popup",
+    width: 520,
+    height: 600
+  });
+  helpWindowId = created.id;
+}
+
 browser.windows.onRemoved.addListener((windowId) => {
   if (windowId === dialogWindowId) dialogWindowId = null;
+  if (windowId === helpWindowId) helpWindowId = null;
 });
 
 async function runCommand(command) {
+  if (command === "show-help") return openHelp();
+
   const windowId = await targetWindowId();
   if (windowId === null) return;
 
@@ -709,6 +733,10 @@ async function handleMessage(message) {
           countTabs(message.snapshot)
         )
       });
+    }
+    case "open-help": {
+      await openHelp();
+      return { ok: true };
     }
     case "open-dialog": {
       const windowId = message.windowId ?? (await targetWindowId());

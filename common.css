@@ -23,6 +23,7 @@
 }
 
 body {
+  position: relative;
   margin: 0;
   padding: 10px;
   min-width: 320px;
@@ -32,7 +33,7 @@ body {
 }
 
 h1 {
-  margin: 0 0 8px;
+  margin: 0 28px 8px 0;
   font-size: 13px;
   font-weight: 600;
 }
@@ -242,4 +243,44 @@ label > select {
 
 .diff b {
   font-weight: 600;
+}
+
+.help-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.help-text {
+  margin: 0 0 10px;
+}
+
+.help-section {
+  margin: 12px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.help-keys {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin: 0 0 10px;
+}
+
+.help-keys dt {
+  white-space: nowrap;
+}
+
+.help-keys dd {
+  margin: 0;
 }

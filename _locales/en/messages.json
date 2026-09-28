@@ -37,6 +37,8 @@
   "cmdAddToGroup": { "message": "Add the current tab to an existing group" },
   "cmdReorderGroups": { "message": "Reorder groups" },
 
+  "cmdShowHelp": { "message": "Show help" },
+
   "popupHint": { "message": "Press 0–9 or pick a row with the mouse." },
   "popupSave": { "message": "Save (Ctrl+Alt+S)" },
   "popupRestore": { "message": "Restore (Ctrl+Alt+R)" },
@@ -114,6 +116,17 @@
   "dlgFileBadJson": { "message": "Could not parse the JSON" },
   "dlgFileRead": { "message": "File read, profile “$1” — press “Import”" },
   "dlgFilePick": { "message": "Pick a profile from the list" },
+
+  "helpButton": { "message": "Help (Ctrl+Alt+H or Ctrl+Alt+?)" },
+  "helpTitle": { "message": "Tab Groups Control — help" },
+  "helpHint": { "message": "Esc — close." },
+  "helpAbout": { "message": "Keyboard control for native Firefox tab groups: collapsing and expanding, jumping to a group, creating and reordering groups, saving and restoring the state of a window." },
+  "helpUsage": { "message": "The state of a window is saved into a profile (only tabs inside groups are kept) and can be restored, exported to a file and imported back. Every command reports its result with a badge on the extension icon." },
+  "helpShortcuts": { "message": "Shortcuts" },
+  "helpToggleGroups": { "message": "Collapse/expand group 1–9" },
+  "helpFocusGroups": { "message": "Go to the first tab of group 1–9" },
+  "helpShow": { "message": "Show this help (also Ctrl+Alt+? inside the extension windows)" },
+  "helpNote": { "message": "Shortcuts can be changed in about:addons → gear icon → Manage Extension Shortcuts." },
 
   "colorBlue": { "message": "blue" },
   "colorCyan": { "message": "cyan" },

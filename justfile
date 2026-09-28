@@ -31,6 +31,7 @@ syntax:
     @node --check dialog.js
     @node --check popup.js
     @node --check i18n.js
+    @node --check help.js
     @node -e "JSON.parse(require('fs').readFileSync('{{ manifest }}'))"
     @echo "syntax ok"
 

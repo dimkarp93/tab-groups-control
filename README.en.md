@@ -46,6 +46,9 @@ In many Linux environments (GNOME, Ubuntu) `Ctrl+Alt+T` is grabbed by the system
 | `Ctrl+Alt+N` | Create a new group for the current tab |
 | `Ctrl+Alt+A` | Add the current tab to an existing group |
 | `Ctrl+Alt+O` | Reorder groups interactively |
+| `Ctrl+Alt+H` | Show the help window; inside the extension windows `Ctrl+Alt+?` works too |
+
+Every extension window has a small **?** button in the top right corner that opens the help (general information and the list of shortcuts, in English or Russian depending on the browser language). Firefox does not allow `?` in the `commands` API, so the global shortcut is `Ctrl+Alt+H`; `Ctrl+Alt+?` is handled by the extension windows themselves.
 
 The result of every command is shown as a badge on the extension icon (`✓` or `!`); the detailed message lives in the icon tooltip, and for snapshots and `Ctrl+Alt+W` also in a system notification.
 

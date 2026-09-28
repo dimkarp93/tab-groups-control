@@ -157,6 +157,10 @@
     "reorder-groups": {
       "suggested_key": { "default": "Ctrl+Alt+O" },
       "description": "__MSG_cmdReorderGroups__"
+    },
+    "show-help": {
+      "suggested_key": { "default": "Ctrl+Alt+H" },
+      "description": "__MSG_cmdShowHelp__"
     }
   }
 }

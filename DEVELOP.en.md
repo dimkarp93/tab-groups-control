@@ -32,6 +32,7 @@ A temporary add-on disappears when Firefox restarts — just repeat steps 1–3.
 11. `Ctrl+Alt+0` with expanded groups — a tab with the home page appears at the end of the strip outside groups, becomes active, and every group collapses without exception.
 12. `Ctrl+Alt+C` — a notification about how many groups and tabs were wiped; the popup says “no snapshot yet”, and `Ctrl+Alt+R` for that profile reports there is nothing to restore.
 13. `Ctrl+Alt+D` — a dialog with a profile picker: Esc cancels, Enter deletes the selected profile.
+14. `Ctrl+Alt+H` or the **?** button in any extension window — a separate help window opens; a second press focuses it instead of opening another one. `Ctrl+Alt+?` inside an extension window does the same.
 
 ## Contents
 
@@ -40,6 +41,7 @@ manifest.json     MV3, permissions: tabs, tabGroups, storage, notifications, bro
 background.js     commands, all the tab group logic, the message handler
 popup.html/js     the Ctrl+Alt+T popup: group list, digits 0–9, snapshot and profile buttons
 dialog.html/js    the dialog window: new | add | order | restore | delete | file (profiles, export/import)
+help.js           the ? button and the Ctrl+Alt+? handler shared by popup and dialog
 i18n.js           t() / uiLocale() / applyI18n() — string substitution driven by data-i18n attributes
 _locales/         en (default) and ru: interface strings, notifications and command descriptions
 common.css        shared styles

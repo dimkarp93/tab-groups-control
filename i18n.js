@@ -13,6 +13,9 @@ function applyI18n(root = document) {
   for (const node of root.querySelectorAll("[data-i18n-title]")) {
     node.title = t(node.dataset.i18nTitle);
   }
+  for (const node of root.querySelectorAll("[data-i18n-aria-label]")) {
+    node.setAttribute("aria-label", t(node.dataset.i18nAriaLabel));
+  }
   for (const node of root.querySelectorAll("[data-i18n-placeholder]")) {
     node.placeholder = t(node.dataset.i18nPlaceholder);
   }

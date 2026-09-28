@@ -639,7 +639,63 @@ async function setupFile() {
   status.textContent = status.textContent || t("dlgFilePick");
 }
 
+const HELP_SHORTCUTS = [
+  ["Ctrl+Alt+T", "cmdExecuteAction"],
+  ["Ctrl+Alt+0", "cmdToggleAll"],
+  ["Ctrl+Alt+1 … 9", "helpToggleGroups"],
+  ["Alt+Shift+1 … 9", "helpFocusGroups"],
+  ["Ctrl+Alt+S", "cmdSaveState"],
+  ["Ctrl+Alt+R", "cmdRestoreState"],
+  ["Ctrl+Alt+W", "cmdCloseUngrouped"],
+  ["Ctrl+Alt+C", "cmdClearProfile"],
+  ["Ctrl+Alt+D", "cmdDeleteProfile"],
+  ["Ctrl+Alt+N", "cmdNewGroup"],
+  ["Ctrl+Alt+A", "cmdAddToGroup"],
+  ["Ctrl+Alt+O", "cmdReorderGroups"],
+  ["Ctrl+Alt+H", "helpShow"]
+];
+
+async function setupHelp() {
+  titleEl.textContent = t("helpTitle");
+  hintEl.textContent = t("helpHint");
+  applyEl.hidden = true;
+  cancelEl.textContent = t("dlgFileClose");
+  document.getElementById("help").hidden = true;
+
+  for (const key of ["helpAbout", "helpUsage"]) {
+    const paragraph = document.createElement("p");
+    paragraph.className = "help-text";
+    paragraph.textContent = t(key);
+    bodyEl.append(paragraph);
+  }
+
+  const heading = document.createElement("h2");
+  heading.className = "help-section";
+  heading.textContent = t("helpShortcuts");
+  bodyEl.append(heading);
+
+  const list = document.createElement("dl");
+  list.className = "help-keys";
+  for (const [keys, messageKey] of HELP_SHORTCUTS) {
+    const term = document.createElement("dt");
+    const key = document.createElement("span");
+    key.className = "key";
+    key.textContent = keys;
+    term.append(key);
+    const description = document.createElement("dd");
+    description.textContent = t(messageKey);
+    list.append(term, description);
+  }
+  bodyEl.append(list);
+
+  const note = document.createElement("p");
+  note.className = "hint";
+  note.textContent = t("helpNote");
+  bodyEl.append(note);
+}
+
 const setups = {
+  help: setupHelp,
   new: setupNew,
   add: setupAdd,
   order: setupOrder,
