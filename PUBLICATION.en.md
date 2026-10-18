@@ -42,7 +42,7 @@ WEB_EXT_API_SECRET=...
 5. **Upload the zip**, wait for the automatic validation.
 6. **Platforms** — *Firefox for Desktop* only. Leave the *Firefox for Android* box unchecked.
 7. **Minified code?** — *No*.
-8. **Fill in the listing** from `docs/amo-listing.en.md`: name, summary, description, categories (`Tabs`), support email and site, MIT license, tags.
+8. **Fill in the listing** from `docs/amo-listing.en.md`: name, summary, description, categories (`Tabs`), support email and site, Apache-2.0 license, tags.
 9. **Notes for Reviewers** — the block at the end of `docs/amo-listing.en.md`.
 10. **Submit Version.**
 11. **Screenshots** — Developer Hub → Edit listing → upload the shots and their captions.

@@ -53,7 +53,7 @@ README.*.md       the user guide, .en.md and .ru.md; README.md is a symlink to t
 DEVELOP.*.md      this page, .en.md and .ru.md; DEVELOP.md is a symlink to the English one (not part of the package)
 PUBLICATION.*.md  the AMO submission procedure, .en.md and .ru.md; PUBLICATION.md is a symlink to the English one (not part of the package)
 ENTRYPOINT.ru.md  the code entry points, Russian only (not part of the package)
-LICENSE           MIT
+LICENSE           Apache-2.0
 ```
 
 ## `just` recipes
