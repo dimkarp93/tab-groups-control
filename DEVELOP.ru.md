@@ -53,7 +53,7 @@ README.*.md       руководство пользователя, .en.md и .ru
 DEVELOP.*.md      эта страница, .en.md и .ru.md; DEVELOP.md — симлинк на английскую версию (в пакет не входит)
 PUBLICATION.*.md  процедура подачи на AMO, .en.md и .ru.md; PUBLICATION.md — симлинк на английскую версию (в пакет не входит)
 ENTRYPOINT.ru.md  точки входа кода, только по-русски (в пакет не входит)
-LICENSE           MIT
+LICENSE           Apache-2.0
 ```
 
 ## Рецепты `just`

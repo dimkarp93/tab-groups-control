@@ -135,4 +135,4 @@ Keep in mind that `savedAt`, the tab titles and the `active` flag change on ever
 
 ## License
 
-[MIT](LICENSE). Mozilla and AMO policies put no restrictions on the license of an add-on — all they require is that the source code be available to the reviewer if the build is minified or produced from another source. Here the code is published as is, with no minification, so MIT contradicts nothing.
+[Apache-2.0](LICENSE). Mozilla and AMO policies put no restrictions on the license of an add-on — all they require is that the source code be available to the reviewer if the build is minified or produced from another source. Here the code is published as is, with no minification, so Apache-2.0 contradicts nothing.
