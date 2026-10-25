@@ -77,7 +77,7 @@ These are shared by every language and are not translated.
 | Field | Value |
 |---|---|
 | Categories | `Tabs` (primary); a second one is optional |
-| License | MIT (same as `LICENSE`) |
+| License | Apache-2.0 (same as `LICENSE`) |
 | Support email | `dimkarp93@gmail.com` |
 | Support site | `https://github.com/dimkarp93/tab-groups-control` |
 | Homepage | `https://github.com/dimkarp93/tab-groups-control` |

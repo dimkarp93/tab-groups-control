@@ -42,7 +42,7 @@ WEB_EXT_API_SECRET=...
 5. **Загрузить zip**, дождаться автовалидации.
 6. **Платформы** — только *Firefox for Desktop*. Галочку *Firefox for Android* не ставить.
 7. **Минифицированный код?** — *No*.
-8. **Заполнить листинг** из `docs/amo-listing.en.md`: name, summary, description, categories (`Tabs`), support email и site, лицензия MIT, теги.
+8. **Заполнить листинг** из `docs/amo-listing.en.md`: name, summary, description, categories (`Tabs`), support email и site, лицензия Apache-2.0, теги.
 9. **Notes for Reviewers** — блок из конца `docs/amo-listing.en.md`.
 10. **Submit Version.**
 11. **Скриншоты** — Developer Hub → Edit listing → загрузить кадры и подписи.
